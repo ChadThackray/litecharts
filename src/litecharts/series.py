@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import uuid
-from typing import TYPE_CHECKING
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING, Generic, TypeVar
 
 from .convert import to_lwc_ohlc_data, to_lwc_single_value_data
+from .types import OhlcInput, SingleValueInput
 
 if TYPE_CHECKING:
     from .types import (
@@ -21,8 +23,10 @@ if TYPE_CHECKING:
         SingleValueData,
     )
 
+DataInputT = TypeVar("DataInputT", SingleValueInput, OhlcInput)
 
-class BaseSeries:
+
+class BaseSeries(ABC, Generic[DataInputT]):
     """Base class for all series types."""
 
     _series_type: str = "Line"
@@ -34,7 +38,7 @@ class BaseSeries:
             options: Series options.
         """
         self._id = f"series_{uuid.uuid4().hex[:8]}"
-        self._options: BaseSeriesOptions = dict(options) if options else {}  # type: ignore[assignment]
+        self._options: BaseSeriesOptions = options.copy() if options else {}
         self._data: list[OhlcData | SingleValueData] = []
         self._markers: list[Marker] = []
 
@@ -63,7 +67,7 @@ class BaseSeries:
         """Return the series markers."""
         return self._markers
 
-    def set_data(self, data: object) -> None:
+    def set_data(self, data: DataInputT) -> None:
         """Set the series data.
 
         Args:
@@ -71,9 +75,10 @@ class BaseSeries:
         """
         self._data = self._convert_data(data)
 
-    def _convert_data(self, data: object) -> list[OhlcData | SingleValueData]:
-        """Convert data to LWC format. Override in subclasses."""
-        return to_lwc_single_value_data(data)
+    @abstractmethod
+    def _convert_data(self, data: DataInputT) -> list[OhlcData | SingleValueData]:
+        """Convert data to LWC format."""
+        ...
 
     def update(self, bar: OhlcData | SingleValueData) -> None:
         """Update with a single data point.
@@ -83,7 +88,7 @@ class BaseSeries:
         """
         from .convert import to_unix_timestamp
 
-        normalized: OhlcData | SingleValueData = dict(bar)  # type: ignore[assignment]
+        normalized: OhlcData | SingleValueData = bar.copy()
         if "time" in normalized:
             normalized["time"] = to_unix_timestamp(normalized["time"])
         self._data.append(normalized)
@@ -98,14 +103,14 @@ class BaseSeries:
 
         self._markers = []
         for marker in markers:
-            normalized: Marker = dict(marker)  # type: ignore[assignment]
+            normalized: Marker = marker.copy()
             if "time" in normalized:
                 time_val = normalized["time"]
                 normalized["time"] = to_unix_timestamp(time_val)
             self._markers.append(normalized)
 
 
-class CandlestickSeries(BaseSeries):
+class CandlestickSeries(BaseSeries[OhlcInput]):
     """Candlestick chart series."""
 
     _series_type = "Candlestick"
@@ -118,12 +123,12 @@ class CandlestickSeries(BaseSeries):
         """
         super().__init__(options)
 
-    def _convert_data(self, data: object) -> list[OhlcData | SingleValueData]:
+    def _convert_data(self, data: OhlcInput) -> list[OhlcData | SingleValueData]:
         """Convert data to OHLC format."""
         return to_lwc_ohlc_data(data)
 
 
-class LineSeries(BaseSeries):
+class LineSeries(BaseSeries[SingleValueInput]):
     """Line chart series."""
 
     _series_type = "Line"
@@ -136,8 +141,12 @@ class LineSeries(BaseSeries):
         """
         super().__init__(options)
 
+    def _convert_data(self, data: SingleValueInput) -> list[OhlcData | SingleValueData]:
+        """Convert data to single-value format."""
+        return to_lwc_single_value_data(data)
 
-class AreaSeries(BaseSeries):
+
+class AreaSeries(BaseSeries[SingleValueInput]):
     """Area chart series."""
 
     _series_type = "Area"
@@ -150,8 +159,12 @@ class AreaSeries(BaseSeries):
         """
         super().__init__(options)
 
+    def _convert_data(self, data: SingleValueInput) -> list[OhlcData | SingleValueData]:
+        """Convert data to single-value format."""
+        return to_lwc_single_value_data(data)
 
-class BarSeries(BaseSeries):
+
+class BarSeries(BaseSeries[OhlcInput]):
     """Bar chart series (OHLC bars)."""
 
     _series_type = "Bar"
@@ -164,12 +177,12 @@ class BarSeries(BaseSeries):
         """
         super().__init__(options)
 
-    def _convert_data(self, data: object) -> list[OhlcData | SingleValueData]:
+    def _convert_data(self, data: OhlcInput) -> list[OhlcData | SingleValueData]:
         """Convert data to OHLC format."""
         return to_lwc_ohlc_data(data)
 
 
-class HistogramSeries(BaseSeries):
+class HistogramSeries(BaseSeries[SingleValueInput]):
     """Histogram chart series."""
 
     _series_type = "Histogram"
@@ -182,8 +195,12 @@ class HistogramSeries(BaseSeries):
         """
         super().__init__(options)
 
+    def _convert_data(self, data: SingleValueInput) -> list[OhlcData | SingleValueData]:
+        """Convert data to single-value format."""
+        return to_lwc_single_value_data(data)
 
-class BaselineSeries(BaseSeries):
+
+class BaselineSeries(BaseSeries[SingleValueInput]):
     """Baseline chart series."""
 
     _series_type = "Baseline"
@@ -195,3 +212,7 @@ class BaselineSeries(BaseSeries):
             options: Baseline series options.
         """
         super().__init__(options)
+
+    def _convert_data(self, data: SingleValueInput) -> list[OhlcData | SingleValueData]:
+        """Convert data to single-value format."""
+        return to_lwc_single_value_data(data)

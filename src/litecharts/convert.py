@@ -5,9 +5,13 @@ from __future__ import annotations
 import calendar
 from collections.abc import Mapping, Sequence
 from datetime import datetime, timezone
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from .types import OhlcData, SingleValueData
+
+if TYPE_CHECKING:
+    import numpy as np
+    import pandas as pd
 
 
 def to_unix_timestamp(time_value: int | float | str | datetime) -> int:
@@ -65,7 +69,7 @@ def _normalize_ohlc_columns(columns: Sequence[str]) -> dict[str, str]:
     return column_map
 
 
-def _convert_dataframe_to_ohlc(df: object) -> list[OhlcData | SingleValueData]:
+def _convert_dataframe_to_ohlc(df: pd.DataFrame) -> list[OhlcData | SingleValueData]:
     """Convert a pandas DataFrame to OHLC data format.
 
     Args:
@@ -74,16 +78,16 @@ def _convert_dataframe_to_ohlc(df: object) -> list[OhlcData | SingleValueData]:
     Returns:
         List of dicts with time, open, high, low, close.
     """
-    columns = list(df.columns)  # type: ignore[attr-defined]
+    columns = list(df.columns)
     col_map = _normalize_ohlc_columns(columns)
 
     result: list[OhlcData | SingleValueData] = []
 
     # Check if index is datetime-like
-    index = df.index  # type: ignore[attr-defined]
+    index = df.index
     has_datetime_index = hasattr(index, "to_pydatetime") or hasattr(index, "asi8")
 
-    for i, row in enumerate(df.itertuples(index=True)):  # type: ignore[attr-defined]
+    for i, row in enumerate(df.itertuples(index=True)):
         data: OhlcData = {}
 
         # Handle time from index or column
@@ -110,7 +114,9 @@ def _convert_dataframe_to_ohlc(df: object) -> list[OhlcData | SingleValueData]:
     return result
 
 
-def _convert_dataframe_to_single_value(df: object) -> list[OhlcData | SingleValueData]:
+def _convert_dataframe_to_single_value(
+    df: pd.DataFrame | pd.Series[float],
+) -> list[OhlcData | SingleValueData]:
     """Convert a pandas DataFrame/Series to single-value data format.
 
     Args:
@@ -120,26 +126,28 @@ def _convert_dataframe_to_single_value(df: object) -> list[OhlcData | SingleValu
         List of dicts with time and value.
     """
     result: list[OhlcData | SingleValueData] = []
-    index = df.index  # type: ignore[attr-defined]
+    index = df.index
     has_datetime_index = hasattr(index, "to_pydatetime") or hasattr(index, "asi8")
 
     # Check if this is a Series-like object
     if hasattr(df, "items") and not hasattr(df, "columns"):
         # It's a Series
+        assert isinstance(df, pd.Series)
         for idx_val, value in df.items():
             item_data: SingleValueData = {"value": float(value)}
             if has_datetime_index:
-                item_data["time"] = to_unix_timestamp(idx_val)
+                item_data["time"] = to_unix_timestamp(idx_val)  # type: ignore[arg-type]
             else:
-                item_data["time"] = int(idx_val)
+                item_data["time"] = int(idx_val)  # type: ignore[call-overload]
             result.append(item_data)
         return result
 
     # It's a DataFrame
-    columns = list(df.columns)  # type: ignore[attr-defined]
+    assert isinstance(df, pd.DataFrame)
+    columns = list(df.columns)
     col_map = _normalize_ohlc_columns(columns)
 
-    for i, row in enumerate(df.itertuples(index=True)):  # type: ignore[attr-defined]
+    for i, row in enumerate(df.itertuples(index=True)):
         data: SingleValueData = {}
 
         # Handle time
@@ -170,7 +178,7 @@ def _convert_dataframe_to_single_value(df: object) -> list[OhlcData | SingleValu
     return result
 
 
-def _convert_numpy_to_ohlc(arr: object) -> list[OhlcData | SingleValueData]:
+def _convert_numpy_to_ohlc(arr: np.ndarray[Any, Any]) -> list[OhlcData | SingleValueData]:
     """Convert a numpy array to OHLC data format.
 
     Expects array with shape (n, 5) for [time, open, high, low, close]
@@ -182,7 +190,7 @@ def _convert_numpy_to_ohlc(arr: object) -> list[OhlcData | SingleValueData]:
     Returns:
         List of dicts with OHLC data.
     """
-    array_list = arr.tolist()  # type: ignore[attr-defined]
+    array_list = arr.tolist()
     result: list[OhlcData | SingleValueData] = []
 
     for row in array_list:
@@ -233,7 +241,9 @@ def _convert_list_of_dicts(
     return result
 
 
-def to_lwc_ohlc_data(data: object) -> list[OhlcData | SingleValueData]:
+def to_lwc_ohlc_data(
+    data: pd.DataFrame | np.ndarray[Any, Any] | list[Mapping[str, Any]],
+) -> list[OhlcData | SingleValueData]:
     """Convert various data formats to LWC OHLC data format.
 
     Args:
@@ -241,27 +251,21 @@ def to_lwc_ohlc_data(data: object) -> list[OhlcData | SingleValueData]:
 
     Returns:
         List of dicts with time, open, high, low, close.
-
-    Raises:
-        TypeError: If data type is not supported.
     """
-    # pandas DataFrame
-    if hasattr(data, "itertuples") and hasattr(data, "columns"):
-        return _convert_dataframe_to_ohlc(data)
-
-    # numpy array
-    if hasattr(data, "tolist") and hasattr(data, "shape"):
-        return _convert_numpy_to_ohlc(data)
-
-    # list of dicts
     if isinstance(data, list):
         return _convert_list_of_dicts(data)
 
-    msg = f"Unsupported data type: {type(data).__name__}"
-    raise TypeError(msg)
+    # pandas DataFrame (check before numpy since DataFrame has shape too)
+    if hasattr(data, "itertuples") and hasattr(data, "columns"):
+        return _convert_dataframe_to_ohlc(data)  # type: ignore[arg-type]
+
+    # numpy array
+    return _convert_numpy_to_ohlc(data)
 
 
-def to_lwc_single_value_data(data: object) -> list[OhlcData | SingleValueData]:
+def to_lwc_single_value_data(
+    data: pd.DataFrame | pd.Series[float] | np.ndarray[Any, Any] | list[Mapping[str, Any]],
+) -> list[OhlcData | SingleValueData]:
     """Convert various data formats to LWC single-value data format.
 
     Args:
@@ -269,24 +273,16 @@ def to_lwc_single_value_data(data: object) -> list[OhlcData | SingleValueData]:
 
     Returns:
         List of dicts with time and value.
-
-    Raises:
-        TypeError: If data type is not supported.
     """
-    # pandas Series or DataFrame
-    if hasattr(data, "index") and (hasattr(data, "columns") or hasattr(data, "items")):
-        return _convert_dataframe_to_single_value(data)
-
-    # numpy array
-    if hasattr(data, "tolist") and hasattr(data, "shape"):
-        return _convert_numpy_to_ohlc(data)
-
-    # list of dicts
     if isinstance(data, list):
         return _convert_list_of_dicts(data)
 
-    msg = f"Unsupported data type: {type(data).__name__}"
-    raise TypeError(msg)
+    # pandas Series or DataFrame
+    if hasattr(data, "index") and (hasattr(data, "columns") or hasattr(data, "items")):
+        return _convert_dataframe_to_single_value(data)  # type: ignore[arg-type]
+
+    # numpy array
+    return _convert_numpy_to_ohlc(data)
 
 
 def to_camel_case(name: str) -> str:

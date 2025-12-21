@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import uuid
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from .series import (
     AreaSeries,
@@ -37,8 +37,8 @@ class Pane:
             options: Pane options including height_ratio.
         """
         self._id = f"pane_{uuid.uuid4().hex[:8]}"
-        self._options: PaneOptions = dict(options) if options else {}  # type: ignore[assignment]
-        self._series: list[BaseSeries] = []
+        self._options: PaneOptions = options.copy() if options else {}
+        self._series: list[BaseSeries[Any]] = []
 
     @property
     def id(self) -> str:
@@ -51,7 +51,7 @@ class Pane:
         return self._options
 
     @property
-    def series(self) -> list[BaseSeries]:
+    def series(self) -> list[BaseSeries[Any]]:
         """Return all series in this pane."""
         return self._series
 

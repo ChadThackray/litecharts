@@ -2,7 +2,18 @@
 
 from __future__ import annotations
 
-from typing import Literal, TypedDict
+from collections.abc import Mapping
+from typing import TYPE_CHECKING, Any, Literal, TypeAlias, TypedDict
+
+if TYPE_CHECKING:
+    import numpy as np
+    import pandas as pd
+
+# Input type aliases for series data
+SingleValueInput: TypeAlias = (
+    pd.DataFrame | pd.Series[float] | np.ndarray[Any, Any] | list[Mapping[str, Any]]
+)
+OhlcInput: TypeAlias = pd.DataFrame | np.ndarray[Any, Any] | list[Mapping[str, Any]]
 
 
 class PriceScaleMargins(TypedDict, total=False):

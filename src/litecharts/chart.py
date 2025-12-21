@@ -52,7 +52,7 @@ class Chart:
             options: Chart options.
         """
         self._id = f"chart_{uuid.uuid4().hex[:8]}"
-        self._options: ChartOptions = dict(options) if options else {}  # type: ignore[assignment]
+        self._options: ChartOptions = options.copy() if options else {}
         self._panes: list[Pane] = []
         self._default_pane: Pane | None = None
 

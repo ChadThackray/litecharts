@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from .series import BaseSeries
 
 
-def _render_series_js(series: BaseSeries, chart_var: str) -> str:
+def _render_series_js(series: BaseSeries[Any], chart_var: str) -> str:
     """Generate JS code for a series.
 
     Args:

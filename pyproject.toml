@@ -32,6 +32,7 @@ dev = [
     "pytest>=7.0",
     "mypy>=1.0",
     "ruff>=0.8",
+    "pandas-stubs>=2.0",
 ]
 
 [project.urls]
