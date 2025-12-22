@@ -7,7 +7,7 @@ from collections.abc import Mapping, Sequence
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any
 
-from .types import OhlcData, SingleValueData
+from .types import DataValue, OhlcData, SingleValueData
 
 if TYPE_CHECKING:
     import numpy as np
@@ -178,7 +178,9 @@ def _convert_dataframe_to_single_value(
     return result
 
 
-def _convert_numpy_to_ohlc(arr: np.ndarray[Any, Any]) -> list[OhlcData | SingleValueData]:
+def _convert_numpy_to_ohlc(
+    arr: np.ndarray[Any, Any],
+) -> list[OhlcData | SingleValueData]:
     """Convert a numpy array to OHLC data format.
 
     Expects array with shape (n, 5) for [time, open, high, low, close]
@@ -220,7 +222,7 @@ def _convert_numpy_to_ohlc(arr: np.ndarray[Any, Any]) -> list[OhlcData | SingleV
 
 
 def _convert_list_of_dicts(
-    data: list[Mapping[str, Any]],
+    data: list[Mapping[str, DataValue]],
 ) -> list[OhlcData | SingleValueData]:
     """Convert a list of dicts, normalizing time values.
 
@@ -242,7 +244,7 @@ def _convert_list_of_dicts(
 
 
 def to_lwc_ohlc_data(
-    data: pd.DataFrame | np.ndarray[Any, Any] | list[Mapping[str, Any]],
+    data: pd.DataFrame | np.ndarray[Any, Any] | list[Mapping[str, DataValue]],
 ) -> list[OhlcData | SingleValueData]:
     """Convert various data formats to LWC OHLC data format.
 
@@ -264,7 +266,10 @@ def to_lwc_ohlc_data(
 
 
 def to_lwc_single_value_data(
-    data: pd.DataFrame | pd.Series[float] | np.ndarray[Any, Any] | list[Mapping[str, Any]],
+    data: pd.DataFrame
+    | pd.Series[float]
+    | np.ndarray[Any, Any]
+    | list[Mapping[str, DataValue]],
 ) -> list[OhlcData | SingleValueData]:
     """Convert various data formats to LWC single-value data format.
 
@@ -302,7 +307,7 @@ def convert_options_to_js(options: Mapping[str, Any]) -> dict[str, Any]:
     """Recursively convert option keys from snake_case to camelCase.
 
     Args:
-        options: Dict with snake_case keys.
+        options: Dict with snake_case keys (typically a TypedDict).
 
     Returns:
         Dict with camelCase keys.

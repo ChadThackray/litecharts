@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import uuid
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from .series import (
     AreaSeries,
@@ -23,7 +23,9 @@ if TYPE_CHECKING:
         CandlestickSeriesOptions,
         HistogramSeriesOptions,
         LineSeriesOptions,
+        OhlcInput,
         PaneOptions,
+        SingleValueInput,
     )
 
 
@@ -38,7 +40,7 @@ class Pane:
         """
         self._id = f"pane_{uuid.uuid4().hex[:8]}"
         self._options: PaneOptions = options.copy() if options else {}
-        self._series: list[BaseSeries[Any]] = []
+        self._series: list[BaseSeries[SingleValueInput] | BaseSeries[OhlcInput]] = []
 
     @property
     def id(self) -> str:
@@ -51,7 +53,7 @@ class Pane:
         return self._options
 
     @property
-    def series(self) -> list[BaseSeries[Any]]:
+    def series(self) -> list[BaseSeries[SingleValueInput] | BaseSeries[OhlcInput]]:
         """Return all series in this pane."""
         return self._series
 

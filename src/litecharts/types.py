@@ -3,17 +3,26 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from datetime import datetime
 from typing import TYPE_CHECKING, Any, Literal, TypeAlias, TypedDict
 
 if TYPE_CHECKING:
     import numpy as np
     import pandas as pd
 
+# Type alias for values in data point dictionaries (time, OHLC values, etc.)
+DataValue: TypeAlias = int | float | str | datetime
+
 # Input type aliases for series data
 SingleValueInput: TypeAlias = (
-    pd.DataFrame | pd.Series[float] | np.ndarray[Any, Any] | list[Mapping[str, Any]]
+    "pd.DataFrame"
+    " | pd.Series[float]"
+    " | np.ndarray[Any, Any]"
+    " | list[Mapping[str, DataValue]]"
 )
-OhlcInput: TypeAlias = pd.DataFrame | np.ndarray[Any, Any] | list[Mapping[str, Any]]
+OhlcInput: TypeAlias = (
+    "pd.DataFrame | np.ndarray[Any, Any] | list[Mapping[str, DataValue]]"
+)
 
 
 class PriceScaleMargins(TypedDict, total=False):

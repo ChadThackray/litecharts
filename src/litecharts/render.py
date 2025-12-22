@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, cast
 
 from ._js import get_lwc_js
 from .convert import convert_options_to_js, convert_options_to_js_list
@@ -12,9 +12,12 @@ if TYPE_CHECKING:
     from .chart import Chart
     from .pane import Pane
     from .series import BaseSeries
+    from .types import OhlcInput, SingleValueInput
 
 
-def _render_series_js(series: BaseSeries[Any], chart_var: str) -> str:
+def _render_series_js(
+    series: BaseSeries[SingleValueInput] | BaseSeries[OhlcInput], chart_var: str
+) -> str:
     """Generate JS code for a series.
 
     Args:
@@ -145,7 +148,7 @@ def render_chart(chart: Chart) -> str:
         if i < len(panes) - 1:
             existing_ts = pane_options.get("time_scale")
             if existing_ts:
-                time_scale = {**cast(dict[str, Any], existing_ts), "visible": False}
+                time_scale = {**cast(dict[str, object], existing_ts), "visible": False}
             else:
                 time_scale = {"visible": False}
             pane_options["time_scale"] = time_scale
