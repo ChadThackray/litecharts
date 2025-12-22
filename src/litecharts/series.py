@@ -21,6 +21,7 @@ if TYPE_CHECKING:
         Marker,
         OhlcData,
         PriceLineOptions,
+        RectangleOptions,
         SingleValueData,
     )
 
@@ -43,6 +44,7 @@ class BaseSeries(ABC, Generic[DataInputT]):
         self._data: list[OhlcData | SingleValueData] = []
         self._markers: list[Marker] = []
         self._price_lines: list[PriceLineOptions] = []
+        self._rectangles: list[RectangleOptions] = []
 
     @property
     def id(self) -> str:
@@ -73,6 +75,51 @@ class BaseSeries(ABC, Generic[DataInputT]):
     def price_lines(self) -> list[PriceLineOptions]:
         """Return the series price lines."""
         return self._price_lines
+
+    @property
+    def rectangles(self) -> list[RectangleOptions]:
+        """Return the series rectangles."""
+        return self._rectangles
+
+    def add_rectangle(
+        self,
+        start_time: int,
+        end_time: int,
+        start_price: float,
+        end_price: float,
+        color: str = "rgba(0, 255, 0, 0.2)",
+    ) -> None:
+        """Add a rectangle primitive to the series.
+
+        Rectangles are drawn behind the candles and can be used to highlight
+        trade zones, support/resistance areas, or other regions of interest.
+
+        Args:
+            start_time: Start time (Unix timestamp).
+            end_time: End time (Unix timestamp).
+            start_price: Start price (vertical position).
+            end_price: End price (vertical position).
+            color: Fill color (default: semi-transparent green).
+
+        Example:
+            >>> series.add_rectangle(
+            ...     start_time=1609459200,
+            ...     end_time=1609545600,
+            ...     start_price=100.0,
+            ...     end_price=110.0,
+            ...     color="rgba(0, 255, 0, 0.2)"
+            ... )
+        """
+        from .convert import to_unix_timestamp
+
+        rect: RectangleOptions = {
+            "start_time": to_unix_timestamp(start_time),
+            "end_time": to_unix_timestamp(end_time),
+            "start_price": start_price,
+            "end_price": end_price,
+            "color": color,
+        }
+        self._rectangles.append(rect)
 
     def create_price_line(self, options: PriceLineOptions) -> None:
         """Create a horizontal price line on the series.

@@ -146,3 +146,58 @@ class TestBaselineSeries:
         """Series type is Baseline."""
         series = BaselineSeries()
         assert series.series_type == "Baseline"
+
+
+class TestRectangles:
+    """Tests for rectangle primitive functionality."""
+
+    def test_add_rectangle_stores_data(self) -> None:
+        """add_rectangle stores rectangle data."""
+        series = CandlestickSeries()
+        series.add_rectangle(
+            start_time=1609459200,
+            end_time=1609545600,
+            start_price=100.0,
+            end_price=110.0,
+            color="rgba(0, 255, 0, 0.2)",
+        )
+        assert len(series.rectangles) == 1
+        assert series.rectangles[0]["start_time"] == 1609459200
+        assert series.rectangles[0]["end_time"] == 1609545600
+        assert series.rectangles[0]["start_price"] == 100.0
+        assert series.rectangles[0]["end_price"] == 110.0
+        assert series.rectangles[0]["color"] == "rgba(0, 255, 0, 0.2)"
+
+    def test_add_multiple_rectangles(self) -> None:
+        """Multiple rectangles can be added."""
+        series = CandlestickSeries()
+        series.add_rectangle(
+            start_time=1609459200,
+            end_time=1609545600,
+            start_price=100.0,
+            end_price=110.0,
+        )
+        series.add_rectangle(
+            start_time=1609545600,
+            end_time=1609632000,
+            start_price=105.0,
+            end_price=95.0,
+            color="rgba(255, 0, 0, 0.2)",
+        )
+        assert len(series.rectangles) == 2
+
+    def test_add_rectangle_default_color(self) -> None:
+        """Default color is semi-transparent green."""
+        series = LineSeries()
+        series.add_rectangle(
+            start_time=1609459200,
+            end_time=1609545600,
+            start_price=100.0,
+            end_price=110.0,
+        )
+        assert series.rectangles[0]["color"] == "rgba(0, 255, 0, 0.2)"
+
+    def test_rectangles_empty_by_default(self) -> None:
+        """Rectangles list is empty by default."""
+        series = CandlestickSeries()
+        assert series.rectangles == []

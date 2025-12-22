@@ -7,6 +7,11 @@ from typing import TYPE_CHECKING, cast
 
 from ._js import get_lwc_js
 from .convert import convert_options_to_js, convert_options_to_js_list
+from .plugins.draw_rectangle import (
+    RECTANGLE_PRIMITIVE_JS,
+    extract_rectangles,
+    render_rectangle_js,
+)
 from .plugins.marker_tooltips import extract_marker_tooltips, render_tooltip_js
 
 if TYPE_CHECKING:
@@ -197,6 +202,11 @@ def render_chart(chart: Chart) -> str:
         for series in pane.series:
             js_lines.append(_render_series_js(series, chart_var))
 
+            # Add rectangles if any (plugin)
+            rectangles = extract_rectangles(series)
+            if rectangles:
+                js_lines.append(render_rectangle_js(chart_var, series.id, rectangles))
+
         # Add marker tooltips if any markers have tooltip data (plugin)
         tooltips = extract_marker_tooltips(pane)
         if tooltips:
@@ -206,6 +216,14 @@ def render_chart(chart: Chart) -> str:
 
     # Time sync
     sync_js = _render_time_sync_js(chart_vars)
+
+    # Check if any series has rectangles (to include primitive class)
+    has_rectangles = any(
+        series.rectangles for pane in panes for series in pane.series
+    )
+    rectangle_script = (
+        f"\n    <script>{RECTANGLE_PRIMITIVE_JS}</script>" if has_rectangles else ""
+    )
 
     # Combine all JS
     all_chart_js = "\n\n    ".join(chart_js_parts)
@@ -232,7 +250,7 @@ def render_chart(chart: Chart) -> str:
     <div id="{container_id}">
         {pane_html}
     </div>
-    <script>{lwc_js}</script>
+    <script>{lwc_js}</script>{rectangle_script}
     <script>
     {all_chart_js}
     </script>

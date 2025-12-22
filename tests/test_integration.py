@@ -125,6 +125,46 @@ class TestEndToEndChartCreation:
         assert "trade-1" in html
         assert "Sell Signal" in html
 
+    def test_chart_with_rectangles(self, sample_ohlc_dicts: list[DataMapping]) -> None:
+        """Create chart with rectangle primitives."""
+        chart = create_chart()
+        series = chart.add_series(CandlestickSeries)
+        series.set_data(sample_ohlc_dicts)
+
+        # Add a trade zone rectangle
+        series.add_rectangle(
+            start_time=1609459200,
+            end_time=1609545600,
+            start_price=100.0,
+            end_price=110.0,
+            color="rgba(0, 255, 0, 0.2)",
+        )
+
+        assert len(series.rectangles) == 1
+
+        # Verify HTML contains rectangle primitive code
+        html = chart.to_html()
+        assert "RectanglePrimitive" in html
+        assert "RectanglePrimitivePaneView" in html
+        assert "RectanglePrimitiveRenderer" in html
+        assert "attachPrimitive" in html
+        assert "startTime" in html
+        assert "endTime" in html
+        assert "startPrice" in html
+        assert "endPrice" in html
+
+    def test_chart_without_rectangles_excludes_primitive(
+        self, sample_ohlc_dicts: list[DataMapping]
+    ) -> None:
+        """Chart without rectangles does not include primitive JS."""
+        chart = create_chart()
+        series = chart.add_series(CandlestickSeries)
+        series.set_data(sample_ohlc_dicts)
+
+        # No rectangles added
+        html = chart.to_html()
+        assert "RectanglePrimitive" not in html
+
 
 class TestHtmlOutputRegression:
     """Hash-based regression tests for HTML output."""
@@ -302,3 +342,36 @@ class TestHtmlOutputRegression:
 
         html = chart.to_html()
         hash_checker("chart_with_price_lines", html)
+
+    def test_chart_with_rectangles_html(
+        self,
+        sample_ohlc_dicts: list[DataMapping],
+        hash_checker: Callable[[str, str], None],
+    ) -> None:
+        """Chart with rectangle primitives HTML output is stable."""
+        chart = Chart()
+        chart._id = "chart_test0008"
+        pane = chart.add_pane()
+        pane._id = "pane_test0008"
+        series = pane.add_series(CandlestickSeries)
+        series._id = "series_test0008"
+        series.set_data(sample_ohlc_dicts)
+
+        # Add trade zone rectangles
+        series.add_rectangle(
+            start_time=1609459200,
+            end_time=1609545600,
+            start_price=100.0,
+            end_price=108.0,
+            color="rgba(76, 175, 80, 0.2)",  # Green for profit
+        )
+        series.add_rectangle(
+            start_time=1609545600,
+            end_time=1609632000,
+            start_price=110.0,
+            end_price=105.0,
+            color="rgba(244, 67, 54, 0.2)",  # Red for loss
+        )
+
+        html = chart.to_html()
+        hash_checker("chart_with_rectangles", html)

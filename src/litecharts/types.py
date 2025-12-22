@@ -398,3 +398,16 @@ class SingleValueData(TypedDict, total=False):
     time: int
     value: float
     color: str
+
+
+class RectangleOptions(TypedDict, total=False):
+    """Options for drawing a rectangle primitive on a series.
+
+    Used for highlighting trade zones, support/resistance areas, etc.
+    """
+
+    start_time: int
+    end_time: int
+    start_price: float
+    end_price: float
+    color: str
