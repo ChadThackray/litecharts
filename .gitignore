@@ -24,6 +24,7 @@ env/
 .pytest_cache/
 .coverage
 htmlcov/
+tests/html_output/
 
 # Bundled JS (downloaded at build time)
 src/litecharts/js/*.js

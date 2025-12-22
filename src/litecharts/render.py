@@ -33,7 +33,8 @@ def _render_series_js(
     data_js = json.dumps(series.data)
 
     lines = [
-        f"const {series_var} = {chart_var}.add{series_type}Series({options_js});",
+        f"const {series_var} = {chart_var}.addSeries("
+        f"LightweightCharts.{series_type}Series, {options_js});",
         f"{series_var}.setData({data_js});",
     ]
 
