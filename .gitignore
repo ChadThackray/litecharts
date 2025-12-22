@@ -42,4 +42,4 @@ claude-docs/
 docs/node_modules/
 docs/.vitepress/cache/
 docs/.vitepress/dist/
-docs/public/examples/
+docs/public/charts/

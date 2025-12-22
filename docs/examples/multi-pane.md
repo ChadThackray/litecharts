@@ -4,7 +4,7 @@ A chart with candlesticks and volume in separate synchronized panes.
 
 ## Live Example
 
-<ChartExample src="/litecharts/examples/multi_pane.html" :height="540" />
+<ChartExample src="/litecharts/charts/multi_pane.html" :height="540" />
 
 ## Python Code
 

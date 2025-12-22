@@ -4,7 +4,7 @@ A simple candlestick chart with sample data.
 
 ## Live Example
 
-<ChartExample src="/litecharts/examples/basic.html" :height="440" />
+<ChartExample src="/litecharts/charts/basic.html" :height="440" />
 
 ## Python Code
 

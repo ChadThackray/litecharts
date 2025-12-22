@@ -4,7 +4,7 @@ A chart with candlesticks and a moving average line overlay.
 
 ## Live Example
 
-<ChartExample src="/litecharts/examples/overlay.html" :height="440" />
+<ChartExample src="/litecharts/charts/overlay.html" :height="440" />
 
 The blue line shows a 5-period moving average overlaid on the candlestick data.
 

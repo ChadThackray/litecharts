@@ -13,7 +13,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
 EXAMPLES_DIR = Path(__file__).parent / "examples"
-OUTPUT_DIR = Path(__file__).parent.parent / "public" / "examples"
+OUTPUT_DIR = Path(__file__).parent.parent / "public" / "charts"
 
 
 def load_and_run_example(example_path: Path) -> str:

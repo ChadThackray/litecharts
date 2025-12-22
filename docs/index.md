@@ -28,7 +28,7 @@ features:
 
 ## See it in action
 
-<ChartExample src="/litecharts/examples/basic.html" :height="440" />
+<ChartExample src="/litecharts/charts/basic.html" :height="440" />
 
 </div>
 
