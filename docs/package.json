@@ -1,0 +1,14 @@
+{
+  "name": "litecharts-docs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate": "cd .. && uv run python docs/scripts/generate-examples.py",
+    "dev": "npm run generate && vitepress dev",
+    "build": "npm run generate && vitepress build",
+    "preview": "vitepress preview"
+  },
+  "devDependencies": {
+    "vitepress": "^1.5.0"
+  }
+}
