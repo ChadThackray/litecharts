@@ -51,7 +51,7 @@ class PriceFormat(TypedDict, total=False):
 
     type: Literal["price", "volume", "percent", "custom"]
     precision: int
-    min_move: float
+    minMove: float
 
 
 class AutoScaleMargins(TypedDict, total=False):
@@ -71,10 +71,10 @@ class BaseValuePrice(TypedDict, total=False):
 class LayoutOptions(TypedDict, total=False):
     """Layout options for the chart."""
 
-    background_color: str
-    text_color: str
-    font_size: int
-    font_family: str
+    backgroundColor: str
+    textColor: str
+    fontSize: int
+    fontFamily: str
 
 
 class GridLineOptions(TypedDict, total=False):
@@ -88,8 +88,8 @@ class GridLineOptions(TypedDict, total=False):
 class GridOptions(TypedDict, total=False):
     """Grid options for the chart."""
 
-    vert_lines: GridLineOptions
-    horz_lines: GridLineOptions
+    vertLines: GridLineOptions
+    horzLines: GridLineOptions
 
 
 class CrosshairLineOptions(TypedDict, total=False):
@@ -99,73 +99,73 @@ class CrosshairLineOptions(TypedDict, total=False):
     width: int
     style: int
     visible: bool
-    label_visible: bool
-    label_background_color: str
+    labelVisible: bool
+    labelBackgroundColor: str
 
 
 class CrosshairOptions(TypedDict, total=False):
     """Crosshair options."""
 
     mode: int
-    vert_line: CrosshairLineOptions
-    horz_line: CrosshairLineOptions
+    vertLine: CrosshairLineOptions
+    horzLine: CrosshairLineOptions
 
 
 class TimeScaleOptions(TypedDict, total=False):
     """Time scale options."""
 
-    right_offset: int
-    bar_spacing: int
-    min_bar_spacing: float
-    fix_left_edge: bool
-    fix_right_edge: bool
-    lock_visible_time_range_on_resize: bool
-    right_bar_stays_on_scroll: bool
-    border_visible: bool
-    border_color: str
+    rightOffset: int
+    barSpacing: int
+    minBarSpacing: float
+    fixLeftEdge: bool
+    fixRightEdge: bool
+    lockVisibleTimeRangeOnResize: bool
+    rightBarStaysOnScroll: bool
+    borderVisible: bool
+    borderColor: str
     visible: bool
-    time_visible: bool
-    seconds_visible: bool
-    shift_visible_range_on_new_bar: bool
-    allow_shift_visible_range_on_whitespace_replacement: bool
-    ticks_visible: bool
-    uniform_distribution: bool
-    minimum_height: int
-    allow_bold_labels: bool
+    timeVisible: bool
+    secondsVisible: bool
+    shiftVisibleRangeOnNewBar: bool
+    allowShiftVisibleRangeOnWhitespaceReplacement: bool
+    ticksVisible: bool
+    uniformDistribution: bool
+    minimumHeight: int
+    allowBoldLabels: bool
 
 
 class PriceScaleOptions(TypedDict, total=False):
     """Price scale options."""
 
-    auto_scale: bool
+    autoScale: bool
     mode: int
-    invert_scale: bool
-    align_labels: bool
-    scale_margins: PriceScaleMargins
-    border_visible: bool
-    border_color: str
-    text_color: str
-    entire_text_only: bool
+    invertScale: bool
+    alignLabels: bool
+    scaleMargins: PriceScaleMargins
+    borderVisible: bool
+    borderColor: str
+    textColor: str
+    entireTextOnly: bool
     visible: bool
-    ticks_visible: bool
-    minimum_width: int
+    ticksVisible: bool
+    minimumWidth: int
 
 
 class HandleScrollOptions(TypedDict, total=False):
     """Handle scroll options."""
 
-    mouse_wheel: bool
-    pressed_mouse_move: bool
-    horz_touch_drag: bool
-    vert_touch_drag: bool
+    mouseWheel: bool
+    pressedMouseMove: bool
+    horzTouchDrag: bool
+    vertTouchDrag: bool
 
 
 class HandleScaleOptions(TypedDict, total=False):
     """Handle scale options."""
 
-    axis_pressed_mouse_move: bool | AxisPressedMouseMoveOptions
-    axis_double_click_reset: bool | AxisDoubleClickOptions
-    mouse_wheel: bool
+    axisPressedMouseMove: bool | AxisPressedMouseMoveOptions
+    axisDoubleClickReset: bool | AxisDoubleClickOptions
+    mouseWheel: bool
     pinch: bool
 
 
@@ -180,7 +180,7 @@ class LocalizationOptions(TypedDict, total=False):
     """Localization options."""
 
     locale: str
-    date_format: str
+    dateFormat: str
 
 
 class WatermarkOptions(TypedDict, total=False):
@@ -189,11 +189,11 @@ class WatermarkOptions(TypedDict, total=False):
     visible: bool
     color: str
     text: str
-    font_size: int
-    font_family: str
-    font_style: str
-    horz_align: Literal["left", "center", "right"]
-    vert_align: Literal["top", "center", "bottom"]
+    fontSize: int
+    fontFamily: str
+    fontStyle: str
+    horzAlign: Literal["left", "center", "right"]
+    vertAlign: Literal["top", "center", "bottom"]
 
 
 class ChartOptions(TypedDict, total=False):
@@ -201,17 +201,17 @@ class ChartOptions(TypedDict, total=False):
 
     width: int
     height: int
-    auto_size: bool
+    autoSize: bool
     layout: LayoutOptions
     grid: GridOptions
     crosshair: CrosshairOptions
-    time_scale: TimeScaleOptions
-    right_price_scale: PriceScaleOptions
-    left_price_scale: PriceScaleOptions
-    overlay_price_scales: dict[str, PriceScaleOptions]
-    handle_scroll: HandleScrollOptions | bool
-    handle_scale: HandleScaleOptions | bool
-    kinetic_scroll: KineticScrollOptions
+    timeScale: TimeScaleOptions
+    rightPriceScale: PriceScaleOptions
+    leftPriceScale: PriceScaleOptions
+    overlayPriceScales: dict[str, PriceScaleOptions]
+    handleScroll: HandleScrollOptions | bool
+    handleScale: HandleScaleOptions | bool
+    kineticScroll: KineticScrollOptions
     localization: LocalizationOptions
     watermark: WatermarkOptions
 
@@ -222,13 +222,13 @@ class PriceLineOptions(TypedDict, total=False):
     id: str
     price: float
     color: str
-    line_width: int
-    line_style: int
-    line_visible: bool
-    axis_label_visible: bool
+    lineWidth: int
+    lineStyle: int
+    lineVisible: bool
+    axisLabelVisible: bool
     title: str
-    axis_label_color: str
-    axis_label_text_color: str
+    axisLabelColor: str
+    axisLabelTextColor: str
 
 
 class LastPriceAnimationOptions(TypedDict, total=False):
@@ -242,81 +242,81 @@ class BaseSeriesOptions(TypedDict, total=False):
 
     title: str
     visible: bool
-    price_line_visible: bool
-    last_value_visible: bool
-    price_line_width: int
-    price_line_color: str
-    price_line_style: int
-    base_line_visible: bool
-    base_line_color: str
-    base_line_width: int
-    base_line_style: int
-    price_format: PriceFormat
-    price_scale_id: str
-    auto_scale_margins: AutoScaleMargins
+    priceLineVisible: bool
+    lastValueVisible: bool
+    priceLineWidth: int
+    priceLineColor: str
+    priceLineStyle: int
+    baseLineVisible: bool
+    baseLineColor: str
+    baseLineWidth: int
+    baseLineStyle: int
+    priceFormat: PriceFormat
+    priceScaleId: str
+    autoScaleMargins: AutoScaleMargins
 
 
 class CandlestickSeriesOptions(BaseSeriesOptions, total=False):
     """Options for candlestick series."""
 
-    up_color: str
-    down_color: str
-    wick_visible: bool
-    border_visible: bool
-    border_color: str
-    border_up_color: str
-    border_down_color: str
-    wick_color: str
-    wick_up_color: str
-    wick_down_color: str
+    upColor: str
+    downColor: str
+    wickVisible: bool
+    borderVisible: bool
+    borderColor: str
+    borderUpColor: str
+    borderDownColor: str
+    wickColor: str
+    wickUpColor: str
+    wickDownColor: str
 
 
 class LineSeriesOptions(BaseSeriesOptions, total=False):
     """Options for line series."""
 
     color: str
-    line_width: int
-    line_style: int
-    line_type: int
-    line_visible: bool
-    point_markers_visible: bool
-    point_markers_radius: float
-    crosshair_marker_visible: bool
-    crosshair_marker_radius: float
-    crosshair_marker_border_color: str
-    crosshair_marker_background_color: str
-    crosshair_marker_border_width: float
-    last_price_animation: int
+    lineWidth: int
+    lineStyle: int
+    lineType: int
+    lineVisible: bool
+    pointMarkersVisible: bool
+    pointMarkersRadius: float
+    crosshairMarkerVisible: bool
+    crosshairMarkerRadius: float
+    crosshairMarkerBorderColor: str
+    crosshairMarkerBackgroundColor: str
+    crosshairMarkerBorderWidth: float
+    lastPriceAnimation: int
 
 
 class AreaSeriesOptions(BaseSeriesOptions, total=False):
     """Options for area series."""
 
-    top_color: str
-    bottom_color: str
-    invert_filled_area: bool
-    line_color: str
-    line_style: int
-    line_width: int
-    line_type: int
-    line_visible: bool
-    point_markers_visible: bool
-    point_markers_radius: float
-    crosshair_marker_visible: bool
-    crosshair_marker_radius: float
-    crosshair_marker_border_color: str
-    crosshair_marker_background_color: str
-    crosshair_marker_border_width: float
-    last_price_animation: int
+    topColor: str
+    bottomColor: str
+    invertFilledArea: bool
+    lineColor: str
+    lineStyle: int
+    lineWidth: int
+    lineType: int
+    lineVisible: bool
+    pointMarkersVisible: bool
+    pointMarkersRadius: float
+    crosshairMarkerVisible: bool
+    crosshairMarkerRadius: float
+    crosshairMarkerBorderColor: str
+    crosshairMarkerBackgroundColor: str
+    crosshairMarkerBorderWidth: float
+    lastPriceAnimation: int
 
 
 class BarSeriesOptions(BaseSeriesOptions, total=False):
     """Options for bar series."""
 
-    up_color: str
-    down_color: str
-    open_visible: bool
-    thin_bars: bool
+    upColor: str
+    downColor: str
+    openVisible: bool
+    thinBars: bool
 
 
 class HistogramSeriesOptions(BaseSeriesOptions, total=False):
@@ -329,33 +329,33 @@ class HistogramSeriesOptions(BaseSeriesOptions, total=False):
 class BaselineSeriesOptions(BaseSeriesOptions, total=False):
     """Options for baseline series."""
 
-    base_value: BaseValuePrice
-    top_fill_color1: str
-    top_fill_color2: str
-    top_line_color: str
-    top_line_style: int
-    top_line_width: int
-    bottom_fill_color1: str
-    bottom_fill_color2: str
-    bottom_line_color: str
-    bottom_line_style: int
-    bottom_line_width: int
-    line_type: int
-    line_visible: bool
-    point_markers_visible: bool
-    point_markers_radius: float
-    crosshair_marker_visible: bool
-    crosshair_marker_radius: float
-    crosshair_marker_border_color: str
-    crosshair_marker_background_color: str
-    crosshair_marker_border_width: float
-    last_price_animation: int
+    baseValue: BaseValuePrice
+    topFillColor1: str
+    topFillColor2: str
+    topLineColor: str
+    topLineStyle: int
+    topLineWidth: int
+    bottomFillColor1: str
+    bottomFillColor2: str
+    bottomLineColor: str
+    bottomLineStyle: int
+    bottomLineWidth: int
+    lineType: int
+    lineVisible: bool
+    pointMarkersVisible: bool
+    pointMarkersRadius: float
+    crosshairMarkerVisible: bool
+    crosshairMarkerRadius: float
+    crosshairMarkerBorderColor: str
+    crosshairMarkerBackgroundColor: str
+    crosshairMarkerBorderWidth: float
+    lastPriceAnimation: int
 
 
 class PaneOptions(TypedDict, total=False):
     """Options for chart panes."""
 
-    height_ratio: float
+    heightRatio: float
 
 
 class MarkerTooltip(TypedDict, total=False):
@@ -372,8 +372,8 @@ class Marker(TypedDict, total=False):
     """Marker to display on a series."""
 
     time: int
-    position: Literal["above_bar", "below_bar", "in_bar"]
-    shape: Literal["circle", "square", "arrow_up", "arrow_down"]
+    position: Literal["aboveBar", "belowBar", "inBar"]
+    shape: Literal["circle", "square", "arrowUp", "arrowDown"]
     color: str
     text: str
     size: int
@@ -406,8 +406,8 @@ class RectangleOptions(TypedDict, total=False):
     Used for highlighting trade zones, support/resistance areas, etc.
     """
 
-    start_time: int
-    end_time: int
-    start_price: float
-    end_price: float
+    startTime: int
+    endTime: int
+    startPrice: float
+    endPrice: float
     color: str

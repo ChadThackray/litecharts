@@ -32,7 +32,7 @@ if TYPE_CHECKING:
     )
 
 
-def _in_jupyter() -> bool:
+def _inJupyter() -> bool:
     """Check if running in a Jupyter environment."""
     try:
         from IPython import get_ipython  # type: ignore[attr-defined]
@@ -57,7 +57,7 @@ class Chart:
         self._id = f"chart_{uuid.uuid4().hex[:8]}"
         self._options: ChartOptions = options.copy() if options else {}
         self._panes: list[Pane] = []
-        self._default_pane: Pane | None = None
+        self._defaultPane: Pane | None = None
 
     @property
     def id(self) -> str:
@@ -90,18 +90,18 @@ class Chart:
             return result
         return 600
 
-    def _get_default_pane(self) -> Pane:
+    def _getDefaultPane(self) -> Pane:
         """Get or create the default pane."""
-        if self._default_pane is None:
-            self._default_pane = Pane()
-            self._panes.append(self._default_pane)
-        return self._default_pane
+        if self._defaultPane is None:
+            self._defaultPane = Pane()
+            self._panes.append(self._defaultPane)
+        return self._defaultPane
 
-    def add_pane(self, options: PaneOptions | None = None) -> Pane:
+    def addPane(self, options: PaneOptions | None = None) -> Pane:
         """Add a new pane to the chart.
 
         Args:
-            options: Pane options including height_ratio.
+            options: Pane options including heightRatio.
 
         Returns:
             The created Pane.
@@ -111,56 +111,56 @@ class Chart:
         return pane
 
     @overload
-    def add_series(
+    def addSeries(
         self,
-        series_type: type[CandlestickSeries],
+        seriesType: type[CandlestickSeries],
         options: CandlestickSeriesOptions | None = None,
-        pane_index: int | None = None,
+        paneIndex: int | None = None,
     ) -> CandlestickSeries: ...
 
     @overload
-    def add_series(
+    def addSeries(
         self,
-        series_type: type[LineSeries],
+        seriesType: type[LineSeries],
         options: LineSeriesOptions | None = None,
-        pane_index: int | None = None,
+        paneIndex: int | None = None,
     ) -> LineSeries: ...
 
     @overload
-    def add_series(
+    def addSeries(
         self,
-        series_type: type[AreaSeries],
+        seriesType: type[AreaSeries],
         options: AreaSeriesOptions | None = None,
-        pane_index: int | None = None,
+        paneIndex: int | None = None,
     ) -> AreaSeries: ...
 
     @overload
-    def add_series(
+    def addSeries(
         self,
-        series_type: type[BarSeries],
+        seriesType: type[BarSeries],
         options: BarSeriesOptions | None = None,
-        pane_index: int | None = None,
+        paneIndex: int | None = None,
     ) -> BarSeries: ...
 
     @overload
-    def add_series(
+    def addSeries(
         self,
-        series_type: type[HistogramSeries],
+        seriesType: type[HistogramSeries],
         options: HistogramSeriesOptions | None = None,
-        pane_index: int | None = None,
+        paneIndex: int | None = None,
     ) -> HistogramSeries: ...
 
     @overload
-    def add_series(
+    def addSeries(
         self,
-        series_type: type[BaselineSeries],
+        seriesType: type[BaselineSeries],
         options: BaselineSeriesOptions | None = None,
-        pane_index: int | None = None,
+        paneIndex: int | None = None,
     ) -> BaselineSeries: ...
 
-    def add_series(
+    def addSeries(
         self,
-        series_type: type[
+        seriesType: type[
             CandlestickSeries
             | LineSeries
             | AreaSeries
@@ -175,40 +175,40 @@ class Chart:
         | HistogramSeriesOptions
         | BaselineSeriesOptions
         | None = None,
-        pane_index: int | None = None,
+        paneIndex: int | None = None,
     ) -> BaseSeries[SingleValueInput] | BaseSeries[OhlcInput]:
         """Add a series to a pane.
 
         Args:
-            series_type: The series class (e.g., CandlestickSeries, LineSeries).
+            seriesType: The series class (e.g., CandlestickSeries, LineSeries).
             options: Series options specific to the series type.
-            pane_index: Index of the pane to add the series to. If None, uses
+            paneIndex: Index of the pane to add the series to. If None, uses
                 the default pane (creating it if necessary).
 
         Returns:
             The created series instance.
 
         Raises:
-            IndexError: If pane_index is out of range.
+            IndexError: If paneIndex is out of range.
         """
-        if pane_index is not None:
-            if pane_index < 0 or pane_index >= len(self._panes):
-                raise IndexError(f"Pane index {pane_index} out of range")
-            pane = self._panes[pane_index]
+        if paneIndex is not None:
+            if paneIndex < 0 or paneIndex >= len(self._panes):
+                raise IndexError(f"Pane index {paneIndex} out of range")
+            pane = self._panes[paneIndex]
         else:
-            pane = self._get_default_pane()
+            pane = self._getDefaultPane()
 
-        return pane.add_series(series_type, options)  # type: ignore[arg-type]
+        return pane.addSeries(seriesType, options)  # type: ignore[arg-type]
 
-    def to_html(self) -> str:
+    def toHtml(self) -> str:
         """Generate self-contained HTML for the chart.
 
         Returns:
             HTML string.
         """
-        from .render import render_chart
+        from .render import renderChart
 
-        return render_chart(self)
+        return renderChart(self)
 
     def show(self) -> None:
         """Display the chart.
@@ -216,18 +216,18 @@ class Chart:
         Auto-detects environment: uses Jupyter inline display if in a notebook,
         otherwise opens in a browser.
         """
-        if _in_jupyter():
-            self.show_notebook()
+        if _inJupyter():
+            self.showNotebook()
         else:
-            self.show_browser()
+            self.showBrowser()
 
-    def show_notebook(self) -> None:
+    def showNotebook(self) -> None:
         """Display the chart inline in a Jupyter notebook."""
         from IPython.display import HTML, display
 
-        display(HTML(self.to_html()))  # type: ignore[no-untyped-call]
+        display(HTML(self.toHtml()))  # type: ignore[no-untyped-call]
 
-    def show_browser(self) -> None:
+    def showBrowser(self) -> None:
         """Open the chart in the default web browser."""
         import tempfile
         import webbrowser
@@ -235,7 +235,7 @@ class Chart:
         with tempfile.NamedTemporaryFile(
             mode="w", suffix=".html", delete=False, encoding="utf-8"
         ) as f:
-            f.write(self.to_html())
+            f.write(self.toHtml())
             temp_path = f.name
 
         webbrowser.open(f"file://{temp_path}")
@@ -247,10 +247,10 @@ class Chart:
             path: File path to save to.
         """
         path = Path(path)
-        path.write_text(self.to_html(), encoding="utf-8")
+        path.write_text(self.toHtml(), encoding="utf-8")
 
 
-def create_chart(options: ChartOptions | None = None) -> Chart:
+def createChart(options: ChartOptions | None = None) -> Chart:
     """Create a new chart.
 
     Args:

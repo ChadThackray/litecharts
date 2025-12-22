@@ -6,7 +6,7 @@ import uuid
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Generic, TypeVar
 
-from .convert import to_lwc_ohlc_data, to_lwc_single_value_data
+from .convert import toLwcOhlcData, toLwcSingleValueData
 from .types import OhlcInput, SingleValueInput
 
 if TYPE_CHECKING:
@@ -31,7 +31,7 @@ DataInputT = TypeVar("DataInputT", SingleValueInput, OhlcInput)
 class BaseSeries(ABC, Generic[DataInputT]):
     """Base class for all series types."""
 
-    _series_type: str = "Line"
+    _seriesType: str = "Line"
 
     def __init__(self, options: BaseSeriesOptions | None = None) -> None:
         """Initialize the series.
@@ -43,7 +43,7 @@ class BaseSeries(ABC, Generic[DataInputT]):
         self._options: BaseSeriesOptions = options.copy() if options else {}
         self._data: list[OhlcData | SingleValueData] = []
         self._markers: list[Marker] = []
-        self._price_lines: list[PriceLineOptions] = []
+        self._priceLines: list[PriceLineOptions] = []
         self._rectangles: list[RectangleOptions] = []
 
     @property
@@ -52,9 +52,9 @@ class BaseSeries(ABC, Generic[DataInputT]):
         return self._id
 
     @property
-    def series_type(self) -> str:
+    def seriesType(self) -> str:
         """Return the series type name."""
-        return self._series_type
+        return self._seriesType
 
     @property
     def options(self) -> BaseSeriesOptions:
@@ -72,21 +72,21 @@ class BaseSeries(ABC, Generic[DataInputT]):
         return self._markers
 
     @property
-    def price_lines(self) -> list[PriceLineOptions]:
+    def priceLines(self) -> list[PriceLineOptions]:
         """Return the series price lines."""
-        return self._price_lines
+        return self._priceLines
 
     @property
     def rectangles(self) -> list[RectangleOptions]:
         """Return the series rectangles."""
         return self._rectangles
 
-    def add_rectangle(
+    def addRectangle(
         self,
-        start_time: int,
-        end_time: int,
-        start_price: float,
-        end_price: float,
+        startTime: int,
+        endTime: int,
+        startPrice: float,
+        endPrice: float,
         color: str = "rgba(0, 255, 0, 0.2)",
     ) -> None:
         """Add a rectangle primitive to the series.
@@ -95,58 +95,58 @@ class BaseSeries(ABC, Generic[DataInputT]):
         trade zones, support/resistance areas, or other regions of interest.
 
         Args:
-            start_time: Start time (Unix timestamp).
-            end_time: End time (Unix timestamp).
-            start_price: Start price (vertical position).
-            end_price: End price (vertical position).
+            startTime: Start time (Unix timestamp).
+            endTime: End time (Unix timestamp).
+            startPrice: Start price (vertical position).
+            endPrice: End price (vertical position).
             color: Fill color (default: semi-transparent green).
 
         Example:
-            >>> series.add_rectangle(
-            ...     start_time=1609459200,
-            ...     end_time=1609545600,
-            ...     start_price=100.0,
-            ...     end_price=110.0,
+            >>> series.addRectangle(
+            ...     startTime=1609459200,
+            ...     endTime=1609545600,
+            ...     startPrice=100.0,
+            ...     endPrice=110.0,
             ...     color="rgba(0, 255, 0, 0.2)"
             ... )
         """
-        from .convert import to_unix_timestamp
+        from .convert import toUnixTimestamp
 
         rect: RectangleOptions = {
-            "start_time": to_unix_timestamp(start_time),
-            "end_time": to_unix_timestamp(end_time),
-            "start_price": start_price,
-            "end_price": end_price,
+            "startTime": toUnixTimestamp(startTime),
+            "endTime": toUnixTimestamp(endTime),
+            "startPrice": startPrice,
+            "endPrice": endPrice,
             "color": color,
         }
         self._rectangles.append(rect)
 
-    def create_price_line(self, options: PriceLineOptions) -> None:
+    def createPriceLine(self, options: PriceLineOptions) -> None:
         """Create a horizontal price line on the series.
 
         Args:
             options: Price line options (price is required).
 
         Example:
-            >>> series.create_price_line({
+            >>> series.createPriceLine({
             ...     "price": 100.0,
             ...     "color": "#ff0000",
-            ...     "line_style": 2,  # Dashed
+            ...     "lineStyle": 2,  # Dashed
             ...     "title": "Support"
             ... })
         """
-        self._price_lines.append(options)
+        self._priceLines.append(options)
 
-    def set_data(self, data: DataInputT) -> None:
+    def setData(self, data: DataInputT) -> None:
         """Set the series data.
 
         Args:
             data: Data as list of dicts, pandas DataFrame/Series, or numpy array.
         """
-        self._data = self._convert_data(data)
+        self._data = self._convertData(data)
 
     @abstractmethod
-    def _convert_data(self, data: DataInputT) -> list[OhlcData | SingleValueData]:
+    def _convertData(self, data: DataInputT) -> list[OhlcData | SingleValueData]:
         """Convert data to LWC format."""
         ...
 
@@ -156,18 +156,18 @@ class BaseSeries(ABC, Generic[DataInputT]):
         Args:
             bar: Single data point dict.
         """
-        from .convert import to_unix_timestamp
+        from .convert import toUnixTimestamp
 
         normalized: OhlcData | SingleValueData = bar.copy()
         if "time" in normalized:
-            normalized["time"] = to_unix_timestamp(normalized["time"])
+            normalized["time"] = toUnixTimestamp(normalized["time"])
         self._data.append(normalized)
 
 
 class CandlestickSeries(BaseSeries[OhlcInput]):
     """Candlestick chart series."""
 
-    _series_type = "Candlestick"
+    _seriesType = "Candlestick"
 
     def __init__(self, options: CandlestickSeriesOptions | None = None) -> None:
         """Initialize the candlestick series.
@@ -177,15 +177,15 @@ class CandlestickSeries(BaseSeries[OhlcInput]):
         """
         super().__init__(options)
 
-    def _convert_data(self, data: OhlcInput) -> list[OhlcData | SingleValueData]:
+    def _convertData(self, data: OhlcInput) -> list[OhlcData | SingleValueData]:
         """Convert data to OHLC format."""
-        return to_lwc_ohlc_data(data)
+        return toLwcOhlcData(data)
 
 
 class LineSeries(BaseSeries[SingleValueInput]):
     """Line chart series."""
 
-    _series_type = "Line"
+    _seriesType = "Line"
 
     def __init__(self, options: LineSeriesOptions | None = None) -> None:
         """Initialize the line series.
@@ -195,15 +195,15 @@ class LineSeries(BaseSeries[SingleValueInput]):
         """
         super().__init__(options)
 
-    def _convert_data(self, data: SingleValueInput) -> list[OhlcData | SingleValueData]:
+    def _convertData(self, data: SingleValueInput) -> list[OhlcData | SingleValueData]:
         """Convert data to single-value format."""
-        return to_lwc_single_value_data(data)
+        return toLwcSingleValueData(data)
 
 
 class AreaSeries(BaseSeries[SingleValueInput]):
     """Area chart series."""
 
-    _series_type = "Area"
+    _seriesType = "Area"
 
     def __init__(self, options: AreaSeriesOptions | None = None) -> None:
         """Initialize the area series.
@@ -213,15 +213,15 @@ class AreaSeries(BaseSeries[SingleValueInput]):
         """
         super().__init__(options)
 
-    def _convert_data(self, data: SingleValueInput) -> list[OhlcData | SingleValueData]:
+    def _convertData(self, data: SingleValueInput) -> list[OhlcData | SingleValueData]:
         """Convert data to single-value format."""
-        return to_lwc_single_value_data(data)
+        return toLwcSingleValueData(data)
 
 
 class BarSeries(BaseSeries[OhlcInput]):
     """Bar chart series (OHLC bars)."""
 
-    _series_type = "Bar"
+    _seriesType = "Bar"
 
     def __init__(self, options: BarSeriesOptions | None = None) -> None:
         """Initialize the bar series.
@@ -231,15 +231,15 @@ class BarSeries(BaseSeries[OhlcInput]):
         """
         super().__init__(options)
 
-    def _convert_data(self, data: OhlcInput) -> list[OhlcData | SingleValueData]:
+    def _convertData(self, data: OhlcInput) -> list[OhlcData | SingleValueData]:
         """Convert data to OHLC format."""
-        return to_lwc_ohlc_data(data)
+        return toLwcOhlcData(data)
 
 
 class HistogramSeries(BaseSeries[SingleValueInput]):
     """Histogram chart series."""
 
-    _series_type = "Histogram"
+    _seriesType = "Histogram"
 
     def __init__(self, options: HistogramSeriesOptions | None = None) -> None:
         """Initialize the histogram series.
@@ -249,15 +249,15 @@ class HistogramSeries(BaseSeries[SingleValueInput]):
         """
         super().__init__(options)
 
-    def _convert_data(self, data: SingleValueInput) -> list[OhlcData | SingleValueData]:
+    def _convertData(self, data: SingleValueInput) -> list[OhlcData | SingleValueData]:
         """Convert data to single-value format."""
-        return to_lwc_single_value_data(data)
+        return toLwcSingleValueData(data)
 
 
 class BaselineSeries(BaseSeries[SingleValueInput]):
     """Baseline chart series."""
 
-    _series_type = "Baseline"
+    _seriesType = "Baseline"
 
     def __init__(self, options: BaselineSeriesOptions | None = None) -> None:
         """Initialize the baseline series.
@@ -267,12 +267,12 @@ class BaselineSeries(BaseSeries[SingleValueInput]):
         """
         super().__init__(options)
 
-    def _convert_data(self, data: SingleValueInput) -> list[OhlcData | SingleValueData]:
+    def _convertData(self, data: SingleValueInput) -> list[OhlcData | SingleValueData]:
         """Convert data to single-value format."""
-        return to_lwc_single_value_data(data)
+        return toLwcSingleValueData(data)
 
 
-def create_series_markers(
+def createSeriesMarkers(
     series: BaseSeries[SingleValueInput] | BaseSeries[OhlcInput],
     markers: list[Marker],
 ) -> None:
@@ -286,18 +286,18 @@ def create_series_markers(
         markers: List of marker dicts.
 
     Example:
-        >>> series = chart.add_series(CandlestickSeries)
-        >>> series.set_data(ohlc_data)
-        >>> create_series_markers(series, [
-        ...     {"time": 1609459200, "position": "above_bar", "shape": "arrow_down",
+        >>> series = chart.addSeries(CandlestickSeries)
+        >>> series.setData(ohlcData)
+        >>> createSeriesMarkers(series, [
+        ...     {"time": 1609459200, "position": "aboveBar", "shape": "arrowDown",
         ...      "color": "#f44336", "text": "Sell"}
         ... ])
     """
-    from .convert import to_unix_timestamp
+    from .convert import toUnixTimestamp
 
     series._markers = []
     for marker in markers:
         normalized: Marker = marker.copy()
         if "time" in normalized:
-            normalized["time"] = to_unix_timestamp(normalized["time"])
+            normalized["time"] = toUnixTimestamp(normalized["time"])
         series._markers.append(normalized)

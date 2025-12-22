@@ -65,4 +65,11 @@ target-version = "py310"
 line-length = 88
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I", "UP", "B", "SIM", "RUF"]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "RUF", "N"]
+ignore = [
+    "N802",  # Function name should be lowercase (we use camelCase to match LWC)
+    "N803",  # Argument name should be lowercase (we use camelCase to match LWC)
+    "N806",  # Variable in function should be lowercase (we use camelCase to match LWC)
+    "N815",  # Variable in class scope should not be mixedCase (we use camelCase)
+    "N816",  # Variable in global scope should not be mixedCase (we use camelCase)
+]

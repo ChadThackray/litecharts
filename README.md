@@ -11,17 +11,17 @@ pip install litecharts
 ## Quick Start
 
 ```python
-from litecharts import create_chart
+from litecharts import createChart, CandlestickSeries
 
 # Create a chart
-chart = create_chart({'width': 800, 'height': 600})
+chart = createChart({"width": 800, "height": 600})
 
 # Add a candlestick series
-candles = chart.add_candlestick_series()
-candles.set_data([
-    {'time': 1609459200, 'open': 100, 'high': 105, 'low': 95, 'close': 102},
-    {'time': 1609545600, 'open': 102, 'high': 110, 'low': 100, 'close': 108},
-    {'time': 1609632000, 'open': 108, 'high': 115, 'low': 105, 'close': 112},
+candles = chart.addSeries(CandlestickSeries)
+candles.setData([
+    {"time": 1609459200, "open": 100, "high": 105, "low": 95, "close": 102},
+    {"time": 1609545600, "open": 102, "high": 110, "low": 100, "close": 108},
+    {"time": 1609632000, "open": 108, "high": 115, "low": 105, "close": 112},
 ])
 
 # Display the chart
@@ -42,34 +42,36 @@ Accepts multiple formats:
 
 ```python
 # List of dicts
-candles.set_data([{'time': 1609459200, 'open': 100, 'high': 105, 'low': 95, 'close': 102}])
+candles.setData([{"time": 1609459200, "open": 100, "high": 105, "low": 95, "close": 102}])
 
 # Pandas DataFrame
 import pandas as pd
-df = pd.DataFrame({'open': [100], 'high': [105], 'low': [95], 'close': [102]},
-                  index=pd.to_datetime(['2021-01-01']))
-candles.set_data(df)
+df = pd.DataFrame({"open": [100], "high": [105], "low": [95], "close": [102]},
+                  index=pd.to_datetime(["2021-01-01"]))
+candles.setData(df)
 
 # NumPy array (columns: time, open, high, low, close)
 import numpy as np
 arr = np.array([[1609459200, 100, 105, 95, 102]])
-candles.set_data(arr)
+candles.setData(arr)
 ```
 
 ## Multi-Pane Charts
 
 ```python
-chart = create_chart({'width': 800, 'height': 600})
+from litecharts import createChart, CandlestickSeries, HistogramSeries
+
+chart = createChart({"width": 800, "height": 600})
 
 # Main pane
-main_pane = chart.add_pane({'height_ratio': 3})
-candles = main_pane.add_candlestick_series()
-candles.set_data(ohlc_data)
+mainPane = chart.addPane({"heightRatio": 3})
+candles = mainPane.addSeries(CandlestickSeries)
+candles.setData(ohlcData)
 
 # Volume pane
-volume_pane = chart.add_pane({'height_ratio': 1})
-volume = volume_pane.add_histogram_series()
-volume.set_data(volume_data)
+volumePane = chart.addPane({"heightRatio": 1})
+volume = volumePane.addSeries(HistogramSeries)
+volume.setData(volumeData)
 
 chart.show()
 ```

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from litecharts.chart import Chart, create_chart
+from litecharts.chart import Chart, createChart
 from litecharts.pane import Pane
 from litecharts.series import (
     AreaSeries,
@@ -62,109 +62,109 @@ class TestChart:
 
 
 class TestChartAddPane:
-    """Tests for Chart add_pane method."""
+    """Tests for Chart addPane method."""
 
     def test_add_pane(self) -> None:
-        """add_pane creates and adds pane."""
+        """addPane creates and adds pane."""
         chart = Chart()
-        pane = chart.add_pane()
+        pane = chart.addPane()
         assert isinstance(pane, Pane)
         assert len(chart.panes) == 1
         assert chart.panes[0] is pane
 
     def test_add_pane_with_options(self) -> None:
-        """add_pane passes options."""
+        """addPane passes options."""
         chart = Chart()
-        pane = chart.add_pane({"height_ratio": 0.5})
-        assert pane.height_ratio == 0.5
+        pane = chart.addPane({"heightRatio": 0.5})
+        assert pane.heightRatio == 0.5
 
     def test_add_multiple_panes(self) -> None:
         """Multiple panes can be added."""
         chart = Chart()
-        chart.add_pane({"height_ratio": 2.0})
-        chart.add_pane({"height_ratio": 1.0})
+        chart.addPane({"heightRatio": 2.0})
+        chart.addPane({"heightRatio": 1.0})
         assert len(chart.panes) == 2
 
 
 class TestChartAddSeries:
-    """Tests for Chart add_series method (via default pane)."""
+    """Tests for Chart addSeries method (via default pane)."""
 
     def test_add_series_creates_default_pane(self) -> None:
-        """add_series creates default pane if needed."""
+        """addSeries creates default pane if needed."""
         chart = Chart()
-        series = chart.add_series(CandlestickSeries)
+        series = chart.addSeries(CandlestickSeries)
         assert isinstance(series, CandlestickSeries)
         assert len(chart.panes) == 1
 
     def test_add_series_reuses_default_pane(self) -> None:
         """Subsequent series use same default pane."""
         chart = Chart()
-        chart.add_series(CandlestickSeries)
-        chart.add_series(LineSeries)
+        chart.addSeries(CandlestickSeries)
+        chart.addSeries(LineSeries)
         assert len(chart.panes) == 1
         assert len(chart.panes[0].series) == 2
 
     def test_add_line_series(self) -> None:
-        """add_series creates LineSeries."""
+        """addSeries creates LineSeries."""
         chart = Chart()
-        series = chart.add_series(LineSeries)
+        series = chart.addSeries(LineSeries)
         assert isinstance(series, LineSeries)
 
     def test_add_area_series(self) -> None:
-        """add_series creates AreaSeries."""
+        """addSeries creates AreaSeries."""
         chart = Chart()
-        series = chart.add_series(AreaSeries)
+        series = chart.addSeries(AreaSeries)
         assert isinstance(series, AreaSeries)
 
     def test_add_bar_series(self) -> None:
-        """add_series creates BarSeries."""
+        """addSeries creates BarSeries."""
         chart = Chart()
-        series = chart.add_series(BarSeries)
+        series = chart.addSeries(BarSeries)
         assert isinstance(series, BarSeries)
 
     def test_add_histogram_series(self) -> None:
-        """add_series creates HistogramSeries."""
+        """addSeries creates HistogramSeries."""
         chart = Chart()
-        series = chart.add_series(HistogramSeries)
+        series = chart.addSeries(HistogramSeries)
         assert isinstance(series, HistogramSeries)
 
     def test_add_baseline_series(self) -> None:
-        """add_series creates BaselineSeries."""
+        """addSeries creates BaselineSeries."""
         chart = Chart()
-        series = chart.add_series(BaselineSeries)
+        series = chart.addSeries(BaselineSeries)
         assert isinstance(series, BaselineSeries)
 
 
 class TestChartToHtml:
-    """Tests for Chart to_html method."""
+    """Tests for Chart toHtml method."""
 
     def test_to_html_empty_chart(self) -> None:
         """Empty chart produces valid HTML with no data message."""
         chart = Chart()
-        html = chart.to_html()
+        html = chart.toHtml()
         assert "<!DOCTYPE html>" in html
         assert "No data to display" in html
 
     def test_to_html_with_series(self, sample_ohlc_dicts: list[DataMapping]) -> None:
         """Chart with data produces HTML with script tags."""
         chart = Chart()
-        series = chart.add_series(CandlestickSeries)
-        series.set_data(sample_ohlc_dicts)
-        html = chart.to_html()
+        series = chart.addSeries(CandlestickSeries)
+        series.setData(sample_ohlc_dicts)
+        html = chart.toHtml()
         assert "<!DOCTYPE html>" in html
         assert "<script>" in html
         assert "LightweightCharts.createChart" in html
 
 
 class TestCreateChart:
-    """Tests for create_chart factory function."""
+    """Tests for createChart factory function."""
 
     def test_create_chart_returns_chart(self) -> None:
-        """create_chart returns Chart instance."""
-        chart = create_chart()
+        """createChart returns Chart instance."""
+        chart = createChart()
         assert isinstance(chart, Chart)
 
     def test_create_chart_with_options(self) -> None:
-        """create_chart passes options."""
-        chart = create_chart({"width": 1000})
+        """createChart passes options."""
+        chart = createChart({"width": 1000})
         assert chart.width == 1000

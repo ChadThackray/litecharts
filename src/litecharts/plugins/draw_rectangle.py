@@ -87,7 +87,7 @@ class RectanglePrimitive {
 """
 
 
-def extract_rectangles(
+def extractRectangles(
     series: BaseSeries[SingleValueInput] | BaseSeries[OhlcInput],
 ) -> list[RectangleOptions]:
     """Extract rectangle data from a series.
@@ -101,38 +101,38 @@ def extract_rectangles(
     return series.rectangles
 
 
-def render_rectangle_js(
-    chart_var: str,
-    series_var: str,
+def renderRectangleJs(
+    chartVar: str,
+    seriesVar: str,
     rectangles: list[RectangleOptions],
 ) -> str:
     """Generate JS code to create and attach the rectangle primitive.
 
     Args:
-        chart_var: The JS variable name of the chart.
-        series_var: The JS variable name of the series.
+        chartVar: The JS variable name of the chart.
+        seriesVar: The JS variable name of the series.
         rectangles: List of rectangle options.
 
     Returns:
         JavaScript code string.
     """
-    # Convert snake_case to camelCase for JS
-    js_rectangles = []
+    # Rectangles are already in camelCase format from the series
+    jsRectangles = []
     for rect in rectangles:
-        js_rect = {
-            "startTime": rect.get("start_time"),
-            "endTime": rect.get("end_time"),
-            "startPrice": rect.get("start_price"),
-            "endPrice": rect.get("end_price"),
+        jsRect = {
+            "startTime": rect.get("startTime"),
+            "endTime": rect.get("endTime"),
+            "startPrice": rect.get("startPrice"),
+            "endPrice": rect.get("endPrice"),
             "color": rect.get("color", "rgba(0, 255, 0, 0.2)"),
         }
-        js_rectangles.append(js_rect)
+        jsRectangles.append(jsRect)
 
-    rectangles_json = json.dumps(js_rectangles)
-    primitive_var = f"rectPrimitive_{series_var}"
+    rectanglesJson = json.dumps(jsRectangles)
+    primitiveVar = f"rectPrimitive_{seriesVar}"
 
-    return f"""// Rectangle primitive for {series_var}
-    const {primitive_var} = new RectanglePrimitive(
-        {chart_var}, {series_var}, {rectangles_json}
+    return f"""// Rectangle primitive for {seriesVar}
+    const {primitiveVar} = new RectanglePrimitive(
+        {chartVar}, {seriesVar}, {rectanglesJson}
     );
-    {series_var}.attachPrimitive({primitive_var});"""
+    {seriesVar}.attachPrimitive({primitiveVar});"""

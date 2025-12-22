@@ -36,7 +36,7 @@ class Pane:
         """Initialize the pane.
 
         Args:
-            options: Pane options including height_ratio.
+            options: Pane options including heightRatio.
         """
         self._id = f"pane_{uuid.uuid4().hex[:8]}"
         self._options: PaneOptions = options.copy() if options else {}
@@ -58,58 +58,58 @@ class Pane:
         return self._series
 
     @property
-    def height_ratio(self) -> float:
+    def heightRatio(self) -> float:
         """Return the height ratio for this pane."""
-        result = self._options.get("height_ratio", 1.0)
+        result = self._options.get("heightRatio", 1.0)
         if isinstance(result, (int, float)):
             return float(result)
         return 1.0
 
     @overload
-    def add_series(
+    def addSeries(
         self,
-        series_type: type[CandlestickSeries],
+        seriesType: type[CandlestickSeries],
         options: CandlestickSeriesOptions | None = None,
     ) -> CandlestickSeries: ...
 
     @overload
-    def add_series(
+    def addSeries(
         self,
-        series_type: type[LineSeries],
+        seriesType: type[LineSeries],
         options: LineSeriesOptions | None = None,
     ) -> LineSeries: ...
 
     @overload
-    def add_series(
+    def addSeries(
         self,
-        series_type: type[AreaSeries],
+        seriesType: type[AreaSeries],
         options: AreaSeriesOptions | None = None,
     ) -> AreaSeries: ...
 
     @overload
-    def add_series(
+    def addSeries(
         self,
-        series_type: type[BarSeries],
+        seriesType: type[BarSeries],
         options: BarSeriesOptions | None = None,
     ) -> BarSeries: ...
 
     @overload
-    def add_series(
+    def addSeries(
         self,
-        series_type: type[HistogramSeries],
+        seriesType: type[HistogramSeries],
         options: HistogramSeriesOptions | None = None,
     ) -> HistogramSeries: ...
 
     @overload
-    def add_series(
+    def addSeries(
         self,
-        series_type: type[BaselineSeries],
+        seriesType: type[BaselineSeries],
         options: BaselineSeriesOptions | None = None,
     ) -> BaselineSeries: ...
 
-    def add_series(
+    def addSeries(
         self,
-        series_type: type[
+        seriesType: type[
             CandlestickSeries
             | LineSeries
             | AreaSeries
@@ -128,12 +128,12 @@ class Pane:
         """Add a series to the pane.
 
         Args:
-            series_type: The series class (e.g., CandlestickSeries, LineSeries).
+            seriesType: The series class (e.g., CandlestickSeries, LineSeries).
             options: Series options specific to the series type.
 
         Returns:
             The created series instance.
         """
-        series = series_type(options)  # type: ignore[arg-type]
+        series = seriesType(options)  # type: ignore[arg-type]
         self._series.append(series)
         return series

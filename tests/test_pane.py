@@ -28,18 +28,18 @@ class TestPane:
 
     def test_custom_options(self) -> None:
         """Custom options are stored."""
-        pane = Pane({"height_ratio": 2.0})
-        assert pane.options["height_ratio"] == 2.0
+        pane = Pane({"heightRatio": 2.0})
+        assert pane.options["heightRatio"] == 2.0
 
     def test_default_height_ratio(self) -> None:
         """Default height ratio is 1.0."""
         pane = Pane()
-        assert pane.height_ratio == 1.0
+        assert pane.heightRatio == 1.0
 
     def test_custom_height_ratio(self) -> None:
         """Custom height ratio is returned."""
-        pane = Pane({"height_ratio": 0.5})
-        assert pane.height_ratio == 0.5
+        pane = Pane({"heightRatio": 0.5})
+        assert pane.heightRatio == 0.5
 
     def test_series_initially_empty(self) -> None:
         """Series list is initially empty."""
@@ -48,61 +48,61 @@ class TestPane:
 
 
 class TestPaneAddSeries:
-    """Tests for Pane add_series method."""
+    """Tests for Pane addSeries method."""
 
     def test_add_candlestick_series(self) -> None:
-        """add_series creates and adds CandlestickSeries."""
+        """addSeries creates and adds CandlestickSeries."""
         pane = Pane()
-        series = pane.add_series(CandlestickSeries)
+        series = pane.addSeries(CandlestickSeries)
         assert isinstance(series, CandlestickSeries)
         assert len(pane.series) == 1
         assert pane.series[0] is series
 
     def test_add_candlestick_series_with_options(self) -> None:
-        """add_series passes options to CandlestickSeries."""
+        """addSeries passes options to CandlestickSeries."""
         pane = Pane()
-        series = pane.add_series(CandlestickSeries, {"up_color": "#00ff00"})
-        assert series.options.get("up_color") == "#00ff00"
+        series = pane.addSeries(CandlestickSeries, {"upColor": "#00ff00"})
+        assert series.options.get("upColor") == "#00ff00"
 
     def test_add_line_series(self) -> None:
-        """add_series creates and adds LineSeries."""
+        """addSeries creates and adds LineSeries."""
         pane = Pane()
-        series = pane.add_series(LineSeries)
+        series = pane.addSeries(LineSeries)
         assert isinstance(series, LineSeries)
         assert len(pane.series) == 1
 
     def test_add_area_series(self) -> None:
-        """add_series creates and adds AreaSeries."""
+        """addSeries creates and adds AreaSeries."""
         pane = Pane()
-        series = pane.add_series(AreaSeries)
+        series = pane.addSeries(AreaSeries)
         assert isinstance(series, AreaSeries)
         assert len(pane.series) == 1
 
     def test_add_bar_series(self) -> None:
-        """add_series creates and adds BarSeries."""
+        """addSeries creates and adds BarSeries."""
         pane = Pane()
-        series = pane.add_series(BarSeries)
+        series = pane.addSeries(BarSeries)
         assert isinstance(series, BarSeries)
         assert len(pane.series) == 1
 
     def test_add_histogram_series(self) -> None:
-        """add_series creates and adds HistogramSeries."""
+        """addSeries creates and adds HistogramSeries."""
         pane = Pane()
-        series = pane.add_series(HistogramSeries)
+        series = pane.addSeries(HistogramSeries)
         assert isinstance(series, HistogramSeries)
         assert len(pane.series) == 1
 
     def test_add_baseline_series(self) -> None:
-        """add_series creates and adds BaselineSeries."""
+        """addSeries creates and adds BaselineSeries."""
         pane = Pane()
-        series = pane.add_series(BaselineSeries)
+        series = pane.addSeries(BaselineSeries)
         assert isinstance(series, BaselineSeries)
         assert len(pane.series) == 1
 
     def test_add_multiple_series(self) -> None:
         """Multiple series can be added to a pane."""
         pane = Pane()
-        pane.add_series(CandlestickSeries)
-        pane.add_series(LineSeries)
-        pane.add_series(HistogramSeries)
+        pane.addSeries(CandlestickSeries)
+        pane.addSeries(LineSeries)
+        pane.addSeries(HistogramSeries)
         assert len(pane.series) == 3

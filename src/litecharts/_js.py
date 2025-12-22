@@ -7,7 +7,7 @@ from importlib.resources import files
 
 
 @lru_cache(maxsize=1)
-def get_lwc_js() -> str:
+def getLwcJs() -> str:
     """Load the bundled Lightweight Charts JavaScript.
 
     Returns:
@@ -16,10 +16,10 @@ def get_lwc_js() -> str:
     Raises:
         FileNotFoundError: If the JS file is not found (package not built correctly).
     """
-    js_path = files("litecharts.js").joinpath("lightweight-charts.js")
+    jsPath = files("litecharts.js").joinpath("lightweight-charts.js")
 
     try:
-        return js_path.read_text(encoding="utf-8")
+        return jsPath.read_text(encoding="utf-8")
     except FileNotFoundError:
         msg = (
             "Lightweight Charts JS not found. "

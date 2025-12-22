@@ -9,7 +9,7 @@ from litecharts.series import (
     CandlestickSeries,
     HistogramSeries,
     LineSeries,
-    create_series_markers,
+    createSeriesMarkers,
 )
 
 from .conftest import DataMapping
@@ -21,7 +21,7 @@ class TestCandlestickSeries:
     def test_series_type(self) -> None:
         """Series type is Candlestick."""
         series = CandlestickSeries()
-        assert series.series_type == "Candlestick"
+        assert series.seriesType == "Candlestick"
 
     def test_default_options(self) -> None:
         """Default options is empty dict."""
@@ -30,8 +30,8 @@ class TestCandlestickSeries:
 
     def test_custom_options(self) -> None:
         """Custom options are stored."""
-        series = CandlestickSeries({"up_color": "#00ff00"})
-        assert series.options.get("up_color") == "#00ff00"
+        series = CandlestickSeries({"upColor": "#00ff00"})
+        assert series.options.get("upColor") == "#00ff00"
 
     def test_id_generated(self) -> None:
         """Series ID is generated."""
@@ -39,9 +39,9 @@ class TestCandlestickSeries:
         assert series.id.startswith("series_")
 
     def test_set_data_converts_ohlc(self, sample_ohlc_dicts: list[DataMapping]) -> None:
-        """set_data converts OHLC data correctly."""
+        """setData converts OHLC data correctly."""
         series = CandlestickSeries()
-        series.set_data(sample_ohlc_dicts)
+        series.setData(sample_ohlc_dicts)
         assert len(series.data) == 3
         assert series.data[0]["time"] == 1609459200
         assert series.data[0].get("open") == 100.0
@@ -61,24 +61,24 @@ class TestCandlestickSeries:
         assert len(series.data) == 1
 
     def test_create_series_markers(self) -> None:
-        """create_series_markers stores normalized markers."""
+        """createSeriesMarkers stores normalized markers."""
         series = CandlestickSeries()
-        create_series_markers(
-            series, [{"time": 1609459200, "position": "above_bar", "shape": "circle"}]
+        createSeriesMarkers(
+            series, [{"time": 1609459200, "position": "aboveBar", "shape": "circle"}]
         )
         assert len(series.markers) == 1
         assert series.markers[0]["time"] == 1609459200
 
     def test_create_series_markers_with_tooltip(self) -> None:
-        """create_series_markers preserves tooltip data."""
+        """createSeriesMarkers preserves tooltip data."""
         series = CandlestickSeries()
-        create_series_markers(
+        createSeriesMarkers(
             series,
             [
                 {
                     "time": 1609459200,
-                    "position": "above_bar",
-                    "shape": "arrow_down",
+                    "position": "aboveBar",
+                    "shape": "arrowDown",
                     "color": "#ff0000",
                     "id": "trade-1",
                     "tooltip": {
@@ -100,14 +100,14 @@ class TestLineSeries:
     def test_series_type(self) -> None:
         """Series type is Line."""
         series = LineSeries()
-        assert series.series_type == "Line"
+        assert series.seriesType == "Line"
 
     def test_set_data_converts_single_value(
         self, sample_single_value_dicts: list[DataMapping]
     ) -> None:
-        """set_data converts single-value data correctly."""
+        """setData converts single-value data correctly."""
         series = LineSeries()
-        series.set_data(sample_single_value_dicts)
+        series.setData(sample_single_value_dicts)
         assert len(series.data) == 3
         assert series.data[0].get("value") == 100.0
 
@@ -118,7 +118,7 @@ class TestAreaSeries:
     def test_series_type(self) -> None:
         """Series type is Area."""
         series = AreaSeries()
-        assert series.series_type == "Area"
+        assert series.seriesType == "Area"
 
 
 class TestBarSeries:
@@ -127,7 +127,7 @@ class TestBarSeries:
     def test_series_type(self) -> None:
         """Series type is Bar."""
         series = BarSeries()
-        assert series.series_type == "Bar"
+        assert series.seriesType == "Bar"
 
 
 class TestHistogramSeries:
@@ -136,7 +136,7 @@ class TestHistogramSeries:
     def test_series_type(self) -> None:
         """Series type is Histogram."""
         series = HistogramSeries()
-        assert series.series_type == "Histogram"
+        assert series.seriesType == "Histogram"
 
 
 class TestBaselineSeries:
@@ -145,43 +145,43 @@ class TestBaselineSeries:
     def test_series_type(self) -> None:
         """Series type is Baseline."""
         series = BaselineSeries()
-        assert series.series_type == "Baseline"
+        assert series.seriesType == "Baseline"
 
 
 class TestRectangles:
     """Tests for rectangle primitive functionality."""
 
     def test_add_rectangle_stores_data(self) -> None:
-        """add_rectangle stores rectangle data."""
+        """addRectangle stores rectangle data."""
         series = CandlestickSeries()
-        series.add_rectangle(
-            start_time=1609459200,
-            end_time=1609545600,
-            start_price=100.0,
-            end_price=110.0,
+        series.addRectangle(
+            startTime=1609459200,
+            endTime=1609545600,
+            startPrice=100.0,
+            endPrice=110.0,
             color="rgba(0, 255, 0, 0.2)",
         )
         assert len(series.rectangles) == 1
-        assert series.rectangles[0]["start_time"] == 1609459200
-        assert series.rectangles[0]["end_time"] == 1609545600
-        assert series.rectangles[0]["start_price"] == 100.0
-        assert series.rectangles[0]["end_price"] == 110.0
+        assert series.rectangles[0]["startTime"] == 1609459200
+        assert series.rectangles[0]["endTime"] == 1609545600
+        assert series.rectangles[0]["startPrice"] == 100.0
+        assert series.rectangles[0]["endPrice"] == 110.0
         assert series.rectangles[0]["color"] == "rgba(0, 255, 0, 0.2)"
 
     def test_add_multiple_rectangles(self) -> None:
         """Multiple rectangles can be added."""
         series = CandlestickSeries()
-        series.add_rectangle(
-            start_time=1609459200,
-            end_time=1609545600,
-            start_price=100.0,
-            end_price=110.0,
+        series.addRectangle(
+            startTime=1609459200,
+            endTime=1609545600,
+            startPrice=100.0,
+            endPrice=110.0,
         )
-        series.add_rectangle(
-            start_time=1609545600,
-            end_time=1609632000,
-            start_price=105.0,
-            end_price=95.0,
+        series.addRectangle(
+            startTime=1609545600,
+            endTime=1609632000,
+            startPrice=105.0,
+            endPrice=95.0,
             color="rgba(255, 0, 0, 0.2)",
         )
         assert len(series.rectangles) == 2
@@ -189,11 +189,11 @@ class TestRectangles:
     def test_add_rectangle_default_color(self) -> None:
         """Default color is semi-transparent green."""
         series = LineSeries()
-        series.add_rectangle(
-            start_time=1609459200,
-            end_time=1609545600,
-            start_price=100.0,
-            end_price=110.0,
+        series.addRectangle(
+            startTime=1609459200,
+            endTime=1609545600,
+            startPrice=100.0,
+            endPrice=110.0,
         )
         assert series.rectangles[0]["color"] == "rgba(0, 255, 0, 0.2)"
 

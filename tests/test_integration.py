@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from litecharts import Chart, create_chart, create_series_markers
+from litecharts import Chart, createChart, createSeriesMarkers
 from litecharts.series import (
     AreaSeries,
     CandlestickSeries,
@@ -25,13 +25,13 @@ class TestEndToEndChartCreation:
         self, sample_ohlc_dicts: list[DataMapping]
     ) -> None:
         """Create a simple candlestick chart."""
-        chart = create_chart({"width": 800, "height": 600})
-        series = chart.add_series(CandlestickSeries, {"up_color": "#26a69a"})
-        series.set_data(sample_ohlc_dicts)
+        chart = createChart({"width": 800, "height": 600})
+        series = chart.addSeries(CandlestickSeries, {"upColor": "#26a69a"})
+        series.setData(sample_ohlc_dicts)
 
         assert len(chart.panes) == 1
         assert len(chart.panes[0].series) == 1
-        assert chart.panes[0].series[0].series_type == "Candlestick"
+        assert chart.panes[0].series[0].seriesType == "Candlestick"
         assert len(chart.panes[0].series[0].data) == 3
 
     def test_multi_series_chart(
@@ -40,11 +40,11 @@ class TestEndToEndChartCreation:
         sample_single_value_dicts: list[DataMapping],
     ) -> None:
         """Create chart with multiple series in same pane."""
-        chart = create_chart()
-        candle = chart.add_series(CandlestickSeries)
-        candle.set_data(sample_ohlc_dicts)
-        line = chart.add_series(LineSeries, {"color": "#ff0000"})
-        line.set_data(sample_single_value_dicts)
+        chart = createChart()
+        candle = chart.addSeries(CandlestickSeries)
+        candle.setData(sample_ohlc_dicts)
+        line = chart.addSeries(LineSeries, {"color": "#ff0000"})
+        line.setData(sample_single_value_dicts)
 
         assert len(chart.panes) == 1
         assert len(chart.panes[0].series) == 2
@@ -55,56 +55,56 @@ class TestEndToEndChartCreation:
         sample_single_value_dicts: list[DataMapping],
     ) -> None:
         """Create chart with multiple panes."""
-        chart = create_chart({"width": 800, "height": 800})
+        chart = createChart({"width": 800, "height": 800})
 
         # Main price pane
-        price_pane = chart.add_pane({"height_ratio": 3.0})
-        candle = price_pane.add_series(CandlestickSeries)
-        candle.set_data(sample_ohlc_dicts)
+        price_pane = chart.addPane({"heightRatio": 3.0})
+        candle = price_pane.addSeries(CandlestickSeries)
+        candle.setData(sample_ohlc_dicts)
 
         # Volume pane
-        volume_pane = chart.add_pane({"height_ratio": 1.0})
-        histogram = volume_pane.add_series(HistogramSeries, {"color": "#26a69a"})
-        histogram.set_data(sample_single_value_dicts)
+        volume_pane = chart.addPane({"heightRatio": 1.0})
+        histogram = volume_pane.addSeries(HistogramSeries, {"color": "#26a69a"})
+        histogram.setData(sample_single_value_dicts)
 
         assert len(chart.panes) == 2
-        assert chart.panes[0].height_ratio == 3.0
-        assert chart.panes[1].height_ratio == 1.0
+        assert chart.panes[0].heightRatio == 3.0
+        assert chart.panes[1].heightRatio == 1.0
 
     def test_chart_with_markers(self, sample_ohlc_dicts: list[DataMapping]) -> None:
         """Create chart with markers on series."""
-        chart = create_chart()
-        series = chart.add_series(CandlestickSeries)
-        series.set_data(sample_ohlc_dicts)
-        create_series_markers(
+        chart = createChart()
+        series = chart.addSeries(CandlestickSeries)
+        series.setData(sample_ohlc_dicts)
+        createSeriesMarkers(
             series,
             [
                 {
                     "time": 1609459200,
-                    "position": "above_bar",
-                    "shape": "arrow_down",
+                    "position": "aboveBar",
+                    "shape": "arrowDown",
                     "color": "#f44336",
                 }
             ],
         )
 
         assert len(series.markers) == 1
-        assert series.markers[0]["position"] == "above_bar"
+        assert series.markers[0]["position"] == "aboveBar"
 
     def test_chart_with_marker_tooltips(
         self, sample_ohlc_dicts: list[DataMapping]
     ) -> None:
         """Create chart with marker tooltips."""
-        chart = create_chart()
-        series = chart.add_series(CandlestickSeries)
-        series.set_data(sample_ohlc_dicts)
-        create_series_markers(
+        chart = createChart()
+        series = chart.addSeries(CandlestickSeries)
+        series.setData(sample_ohlc_dicts)
+        createSeriesMarkers(
             series,
             [
                 {
                     "time": 1609459200,
-                    "position": "above_bar",
-                    "shape": "arrow_down",
+                    "position": "aboveBar",
+                    "shape": "arrowDown",
                     "color": "#f44336",
                     "id": "trade-1",
                     "tooltip": {
@@ -119,7 +119,7 @@ class TestEndToEndChartCreation:
         assert series.markers[0]["tooltip"]["title"] == "Sell Signal"
 
         # Verify HTML contains tooltip code
-        html = chart.to_html()
+        html = chart.toHtml()
         assert "subscribeCrosshairMove" in html
         assert "markerTooltips_" in html
         assert "trade-1" in html
@@ -127,23 +127,23 @@ class TestEndToEndChartCreation:
 
     def test_chart_with_rectangles(self, sample_ohlc_dicts: list[DataMapping]) -> None:
         """Create chart with rectangle primitives."""
-        chart = create_chart()
-        series = chart.add_series(CandlestickSeries)
-        series.set_data(sample_ohlc_dicts)
+        chart = createChart()
+        series = chart.addSeries(CandlestickSeries)
+        series.setData(sample_ohlc_dicts)
 
         # Add a trade zone rectangle
-        series.add_rectangle(
-            start_time=1609459200,
-            end_time=1609545600,
-            start_price=100.0,
-            end_price=110.0,
+        series.addRectangle(
+            startTime=1609459200,
+            endTime=1609545600,
+            startPrice=100.0,
+            endPrice=110.0,
             color="rgba(0, 255, 0, 0.2)",
         )
 
         assert len(series.rectangles) == 1
 
         # Verify HTML contains rectangle primitive code
-        html = chart.to_html()
+        html = chart.toHtml()
         assert "RectanglePrimitive" in html
         assert "RectanglePrimitivePaneView" in html
         assert "RectanglePrimitiveRenderer" in html
@@ -157,12 +157,12 @@ class TestEndToEndChartCreation:
         self, sample_ohlc_dicts: list[DataMapping]
     ) -> None:
         """Chart without rectangles does not include primitive JS."""
-        chart = create_chart()
-        series = chart.add_series(CandlestickSeries)
-        series.set_data(sample_ohlc_dicts)
+        chart = createChart()
+        series = chart.addSeries(CandlestickSeries)
+        series.setData(sample_ohlc_dicts)
 
         # No rectangles added
-        html = chart.to_html()
+        html = chart.toHtml()
         assert "RectanglePrimitive" not in html
 
 
@@ -174,7 +174,7 @@ class TestHtmlOutputRegression:
         chart = Chart()
         # Override ID for deterministic output
         chart._id = "chart_test0001"
-        html = chart.to_html()
+        html = chart.toHtml()
         hash_checker("empty_chart", html)
 
     def test_simple_candlestick_html(
@@ -185,15 +185,15 @@ class TestHtmlOutputRegression:
         """Simple candlestick chart HTML output is stable."""
         chart = Chart({"width": 800, "height": 600})
         chart._id = "chart_test0002"
-        pane = chart.add_pane()
+        pane = chart.addPane()
         pane._id = "pane_test0001"
-        series = pane.add_series(
-            CandlestickSeries, {"up_color": "#26a69a", "down_color": "#ef5350"}
+        series = pane.addSeries(
+            CandlestickSeries, {"upColor": "#26a69a", "downColor": "#ef5350"}
         )
         series._id = "series_test0001"
-        series.set_data(sample_ohlc_dicts)
+        series.setData(sample_ohlc_dicts)
 
-        html = chart.to_html()
+        html = chart.toHtml()
         hash_checker("simple_candlestick", html)
 
     def test_multi_pane_html(
@@ -206,19 +206,19 @@ class TestHtmlOutputRegression:
         chart = Chart({"width": 800, "height": 800})
         chart._id = "chart_test0003"
 
-        price_pane = chart.add_pane({"height_ratio": 3.0})
+        price_pane = chart.addPane({"heightRatio": 3.0})
         price_pane._id = "pane_test0002"
-        candle = price_pane.add_series(CandlestickSeries)
+        candle = price_pane.addSeries(CandlestickSeries)
         candle._id = "series_test0002"
-        candle.set_data(sample_ohlc_dicts)
+        candle.setData(sample_ohlc_dicts)
 
-        volume_pane = chart.add_pane({"height_ratio": 1.0})
+        volume_pane = chart.addPane({"heightRatio": 1.0})
         volume_pane._id = "pane_test0003"
-        histogram = volume_pane.add_series(HistogramSeries, {"color": "#26a69a"})
+        histogram = volume_pane.addSeries(HistogramSeries, {"color": "#26a69a"})
         histogram._id = "series_test0003"
-        histogram.set_data(sample_single_value_dicts)
+        histogram.setData(sample_single_value_dicts)
 
-        html = chart.to_html()
+        html = chart.toHtml()
         hash_checker("multi_pane", html)
 
     def test_line_series_html(
@@ -229,13 +229,13 @@ class TestHtmlOutputRegression:
         """Line series chart HTML output is stable."""
         chart = Chart({"width": 600, "height": 400})
         chart._id = "chart_test0004"
-        pane = chart.add_pane()
+        pane = chart.addPane()
         pane._id = "pane_test0004"
-        series = pane.add_series(LineSeries, {"color": "#2196f3", "line_width": 2})
+        series = pane.addSeries(LineSeries, {"color": "#2196f3", "lineWidth": 2})
         series._id = "series_test0004"
-        series.set_data(sample_single_value_dicts)
+        series.setData(sample_single_value_dicts)
 
-        html = chart.to_html()
+        html = chart.toHtml()
         hash_checker("line_series", html)
 
     def test_area_series_html(
@@ -246,20 +246,20 @@ class TestHtmlOutputRegression:
         """Area series chart HTML output is stable."""
         chart = Chart()
         chart._id = "chart_test0005"
-        pane = chart.add_pane()
+        pane = chart.addPane()
         pane._id = "pane_test0005"
-        series = pane.add_series(
+        series = pane.addSeries(
             AreaSeries,
             {
-                "line_color": "#2196f3",
-                "top_color": "rgba(33, 150, 243, 0.4)",
-                "bottom_color": "rgba(33, 150, 243, 0.0)",
+                "lineColor": "#2196f3",
+                "topColor": "rgba(33, 150, 243, 0.4)",
+                "bottomColor": "rgba(33, 150, 243, 0.0)",
             },
         )
         series._id = "series_test0005"
-        series.set_data(sample_single_value_dicts)
+        series.setData(sample_single_value_dicts)
 
-        html = chart.to_html()
+        html = chart.toHtml()
         hash_checker("area_series", html)
 
     def test_chart_with_markers_html(
@@ -270,18 +270,18 @@ class TestHtmlOutputRegression:
         """Chart with markers HTML output is stable."""
         chart = Chart()
         chart._id = "chart_test0006"
-        pane = chart.add_pane()
+        pane = chart.addPane()
         pane._id = "pane_test0006"
-        series = pane.add_series(CandlestickSeries)
+        series = pane.addSeries(CandlestickSeries)
         series._id = "series_test0006"
-        series.set_data(sample_ohlc_dicts)
-        create_series_markers(
+        series.setData(sample_ohlc_dicts)
+        createSeriesMarkers(
             series,
             [
                 {
                     "time": 1609459200,
-                    "position": "above_bar",
-                    "shape": "arrow_down",
+                    "position": "aboveBar",
+                    "shape": "arrowDown",
                     "color": "#f44336",
                     "text": "Sell",
                     "id": "sell-1",
@@ -292,8 +292,8 @@ class TestHtmlOutputRegression:
                 },
                 {
                     "time": 1609632000,
-                    "position": "below_bar",
-                    "shape": "arrow_up",
+                    "position": "belowBar",
+                    "shape": "arrowUp",
                     "color": "#4caf50",
                     "text": "Buy",
                     "id": "buy-1",
@@ -305,7 +305,7 @@ class TestHtmlOutputRegression:
             ],
         )
 
-        html = chart.to_html()
+        html = chart.toHtml()
         hash_checker("chart_with_markers", html)
 
     def test_chart_with_price_lines_html(
@@ -316,31 +316,35 @@ class TestHtmlOutputRegression:
         """Chart with price lines HTML output is stable."""
         chart = Chart()
         chart._id = "chart_test0007"
-        pane = chart.add_pane()
+        pane = chart.addPane()
         pane._id = "pane_test0007"
-        series = pane.add_series(CandlestickSeries)
+        series = pane.addSeries(CandlestickSeries)
         series._id = "series_test0007"
-        series.set_data(sample_ohlc_dicts)
+        series.setData(sample_ohlc_dicts)
 
         # Add price lines at support and resistance levels
-        series.create_price_line({
-            "price": 100.0,
-            "color": "#4caf50",
-            "line_width": 2,
-            "line_style": 2,  # Dashed
-            "title": "Support",
-            "axis_label_visible": True,
-        })
-        series.create_price_line({
-            "price": 115.0,
-            "color": "#f44336",
-            "line_width": 2,
-            "line_style": 0,  # Solid
-            "title": "Resistance",
-            "axis_label_visible": True,
-        })
+        series.createPriceLine(
+            {
+                "price": 100.0,
+                "color": "#4caf50",
+                "lineWidth": 2,
+                "lineStyle": 2,  # Dashed
+                "title": "Support",
+                "axisLabelVisible": True,
+            }
+        )
+        series.createPriceLine(
+            {
+                "price": 115.0,
+                "color": "#f44336",
+                "lineWidth": 2,
+                "lineStyle": 0,  # Solid
+                "title": "Resistance",
+                "axisLabelVisible": True,
+            }
+        )
 
-        html = chart.to_html()
+        html = chart.toHtml()
         hash_checker("chart_with_price_lines", html)
 
     def test_chart_with_rectangles_html(
@@ -351,27 +355,27 @@ class TestHtmlOutputRegression:
         """Chart with rectangle primitives HTML output is stable."""
         chart = Chart()
         chart._id = "chart_test0008"
-        pane = chart.add_pane()
+        pane = chart.addPane()
         pane._id = "pane_test0008"
-        series = pane.add_series(CandlestickSeries)
+        series = pane.addSeries(CandlestickSeries)
         series._id = "series_test0008"
-        series.set_data(sample_ohlc_dicts)
+        series.setData(sample_ohlc_dicts)
 
         # Add trade zone rectangles
-        series.add_rectangle(
-            start_time=1609459200,
-            end_time=1609545600,
-            start_price=100.0,
-            end_price=108.0,
+        series.addRectangle(
+            startTime=1609459200,
+            endTime=1609545600,
+            startPrice=100.0,
+            endPrice=108.0,
             color="rgba(76, 175, 80, 0.2)",  # Green for profit
         )
-        series.add_rectangle(
-            start_time=1609545600,
-            end_time=1609632000,
-            start_price=110.0,
-            end_price=105.0,
+        series.addRectangle(
+            startTime=1609545600,
+            endTime=1609632000,
+            startPrice=110.0,
+            endPrice=105.0,
             color="rgba(244, 67, 54, 0.2)",  # Red for loss
         )
 
-        html = chart.to_html()
+        html = chart.toHtml()
         hash_checker("chart_with_rectangles", html)

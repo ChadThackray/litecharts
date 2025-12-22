@@ -1,6 +1,6 @@
 """Litecharts - Python wrapper for TradingView Lightweight Charts."""
 
-from .chart import Chart, create_chart
+from .chart import Chart, createChart
 from .pane import Pane
 from .series import (
     AreaSeries,
@@ -10,7 +10,7 @@ from .series import (
     CandlestickSeries,
     HistogramSeries,
     LineSeries,
-    create_series_markers,
+    createSeriesMarkers,
 )
 from .types import (
     AreaSeriesOptions,
@@ -95,6 +95,6 @@ __all__ = [
     "SingleValueData",
     "TimeScaleOptions",
     "WatermarkOptions",
-    "create_chart",
-    "create_series_markers",
+    "createChart",
+    "createSeriesMarkers",
 ]
