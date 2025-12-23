@@ -183,13 +183,16 @@ class Chart:
             seriesType: The series class (e.g., CandlestickSeries, LineSeries).
             options: Series options specific to the series type.
             paneIndex: Index of the pane to add the series to. If None, uses
-                the default pane (creating it if necessary).
+                the default pane (creating it if necessary). Note: explicit
+                pane indices require the pane to already exist via addPane().
+                Use paneIndex=None for automatic default pane creation.
 
         Returns:
             The created series instance.
 
         Raises:
-            IndexError: If paneIndex is out of range.
+            IndexError: If paneIndex is out of range (panes must be created
+                with addPane() before using explicit indices).
         """
         if paneIndex is not None:
             if paneIndex < 0 or paneIndex >= len(self._panes):
