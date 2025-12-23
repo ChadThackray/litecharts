@@ -58,16 +58,14 @@ def getPluginScripts() -> str:
 def getDefaultStyles(containerId: str) -> str:
     """Get default CSS styles for a chart container.
 
-    Returns container-scoped styles only (flexbox for pane stacking).
-    Does not include body-level styles.
+    With native LWC panes, minimal styling is needed as LWC manages
+    pane layout internally. Returns an empty string for compatibility.
 
     Args:
         containerId: The chart container ID (e.g., chart.id).
 
     Returns:
-        CSS rules for the container.
+        CSS rules for the container (currently empty).
     """
-    return f"""#container_{containerId} {{
-    display: flex;
-    flex-direction: column;
-}}"""
+    # Native LWC panes handle layout internally, no CSS needed
+    return f"/* styles for #container_{containerId} */"

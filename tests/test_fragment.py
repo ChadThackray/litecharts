@@ -25,12 +25,13 @@ class TestToFragment:
         fragment = chart.toFragment()
         assert f'id="container_{chart.id}"' in fragment
 
-    def test_returns_pane_divs(self) -> None:
-        """Fragment contains pane divs."""
+    def test_uses_native_panes(self) -> None:
+        """Fragment uses native LWC pane API."""
         chart = createChart()
         chart.addSeries(LineSeries).setData([{"time": 1609459200, "value": 100.0}])
         fragment = chart.toFragment()
-        assert f'id="container_{chart.id}_pane_0"' in fragment
+        # Native panes use chart.panes()[0] to get default pane
+        assert ".panes()[0]" in fragment
 
     def test_no_doctype(self) -> None:
         """Fragment does NOT include DOCTYPE."""
@@ -124,10 +125,10 @@ class TestToFragment:
         fragment = chart.toFragment()
         assert "markerTooltips_" in fragment
 
-    def test_multi_pane_includes_sync_js(
+    def test_multi_pane_uses_native_api(
         self, sample_ohlc_dicts: list[DataMapping]
     ) -> None:
-        """Multi-pane fragment includes time sync JS."""
+        """Multi-pane fragment uses native LWC pane API (no manual sync)."""
         chart = createChart()
         pane1 = chart.addPane()
         pane1.addSeries(CandlestickSeries).setData(sample_ohlc_dicts)
@@ -137,7 +138,12 @@ class TestToFragment:
             {"time": 1609545600, "value": 110.0},
         ])
         fragment = chart.toFragment()
-        assert "subscribeVisibleLogicalRangeChange" in fragment
+        # Native panes don't need manual time sync
+        assert "subscribeVisibleLogicalRangeChange" not in fragment
+        # Uses addPane() for additional panes
+        assert ".addPane()" in fragment
+        # Sets stretch factor for sizing
+        assert ".setStretchFactor(" in fragment
 
 
 class TestGetLwcScript:
@@ -182,15 +188,15 @@ class TestGetDefaultStyles:
     """Tests for getDefaultStyles() function."""
 
     def test_returns_container_scoped_css(self) -> None:
-        """getDefaultStyles returns CSS for the container."""
+        """getDefaultStyles returns CSS comment for the container."""
         styles = getDefaultStyles("test123")
-        assert "#container_test123" in styles
+        assert "container_test123" in styles
 
-    def test_includes_flexbox(self) -> None:
-        """getDefaultStyles includes flexbox for pane stacking."""
+    def test_no_flexbox_needed(self) -> None:
+        """getDefaultStyles no longer needs flexbox (native panes handle layout)."""
         styles = getDefaultStyles("test123")
-        assert "display: flex" in styles
-        assert "flex-direction: column" in styles
+        # Native LWC panes handle layout internally
+        assert "display: flex" not in styles
 
     def test_no_body_styles(self) -> None:
         """getDefaultStyles does NOT include body-level styles."""

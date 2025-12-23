@@ -58,18 +58,18 @@ class TestEndToEndChartCreation:
         chart = createChart({"width": 800, "height": 800})
 
         # Main price pane
-        price_pane = chart.addPane({"heightRatio": 3.0})
+        price_pane = chart.addPane({"stretchFactor": 3.0})
         candle = price_pane.addSeries(CandlestickSeries)
         candle.setData(sample_ohlc_dicts)
 
         # Volume pane
-        volume_pane = chart.addPane({"heightRatio": 1.0})
+        volume_pane = chart.addPane({"stretchFactor": 1.0})
         histogram = volume_pane.addSeries(HistogramSeries, {"color": "#26a69a"})
         histogram.setData(sample_single_value_dicts)
 
         assert len(chart.panes) == 2
-        assert chart.panes[0].heightRatio == 3.0
-        assert chart.panes[1].heightRatio == 1.0
+        assert chart.panes[0].stretchFactor == 3.0
+        assert chart.panes[1].stretchFactor == 1.0
 
     def test_chart_with_markers(self, sample_ohlc_dicts: list[DataMapping]) -> None:
         """Create chart with markers on series."""
@@ -206,13 +206,13 @@ class TestHtmlOutputRegression:
         chart = Chart({"width": 800, "height": 800})
         chart._id = "chart_test0003"
 
-        price_pane = chart.addPane({"heightRatio": 3.0})
+        price_pane = chart.addPane({"stretchFactor": 3.0})
         price_pane._id = "pane_test0002"
         candle = price_pane.addSeries(CandlestickSeries)
         candle._id = "series_test0002"
         candle.setData(sample_ohlc_dicts)
 
-        volume_pane = chart.addPane({"heightRatio": 1.0})
+        volume_pane = chart.addPane({"stretchFactor": 1.0})
         volume_pane._id = "pane_test0003"
         histogram = volume_pane.addSeries(HistogramSeries, {"color": "#26a69a"})
         histogram._id = "series_test0003"

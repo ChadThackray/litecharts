@@ -73,12 +73,12 @@ from litecharts import createChart, CandlestickSeries, HistogramSeries
 chart = createChart({"width": 800, "height": 600})
 
 # Main pane
-mainPane = chart.addPane({"heightRatio": 3})
+mainPane = chart.addPane({"stretchFactor": 3})
 candles = mainPane.addSeries(CandlestickSeries)
 candles.setData(ohlcData)
 
 # Volume pane
-volumePane = chart.addPane({"heightRatio": 1})
+volumePane = chart.addPane({"stretchFactor": 1})
 volume = volumePane.addSeries(HistogramSeries)
 volume.setData(volumeData)
 

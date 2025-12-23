@@ -101,7 +101,7 @@ class Chart:
         """Add a new pane to the chart.
 
         Args:
-            options: Pane options including heightRatio.
+            options: Pane options including stretchFactor.
 
         Returns:
             The created Pane.

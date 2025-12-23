@@ -36,7 +36,7 @@ class Pane:
         """Initialize the pane.
 
         Args:
-            options: Pane options including heightRatio.
+            options: Pane options including stretchFactor.
         """
         self._id = f"pane_{uuid.uuid4().hex[:8]}"
         self._options: PaneOptions = options.copy() if options else {}
@@ -58,9 +58,9 @@ class Pane:
         return self._series
 
     @property
-    def heightRatio(self) -> float:
-        """Return the height ratio for this pane."""
-        result = self._options.get("heightRatio", 1.0)
+    def stretchFactor(self) -> float:
+        """Return the stretch factor for this pane."""
+        result = self._options.get("stretchFactor", 1.0)
         if isinstance(result, (int, float)):
             return float(result)
         return 1.0

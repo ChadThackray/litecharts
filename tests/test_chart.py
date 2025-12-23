@@ -75,14 +75,14 @@ class TestChartAddPane:
     def test_add_pane_with_options(self) -> None:
         """addPane passes options."""
         chart = Chart()
-        pane = chart.addPane({"heightRatio": 0.5})
-        assert pane.heightRatio == 0.5
+        pane = chart.addPane({"stretchFactor": 0.5})
+        assert pane.stretchFactor == 0.5
 
     def test_add_multiple_panes(self) -> None:
         """Multiple panes can be added."""
         chart = Chart()
-        chart.addPane({"heightRatio": 2.0})
-        chart.addPane({"heightRatio": 1.0})
+        chart.addPane({"stretchFactor": 2.0})
+        chart.addPane({"stretchFactor": 1.0})
         assert len(chart.panes) == 2
 
 

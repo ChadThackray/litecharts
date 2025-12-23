@@ -10,12 +10,12 @@ from litecharts import createChart, CandlestickSeries, HistogramSeries
 chart = createChart({"width": 800, "height": 600})
 
 # Main pane for price
-mainPane = chart.addPane({"heightRatio": 3})
+mainPane = chart.addPane({"stretchFactor": 3})
 candles = mainPane.addSeries(CandlestickSeries)
 candles.setData(ohlcData)
 
 # Secondary pane for volume
-volumePane = chart.addPane({"heightRatio": 1})
+volumePane = chart.addPane({"stretchFactor": 1})
 volume = volumePane.addSeries(HistogramSeries)
 volume.setData(volumeData)
 
@@ -24,16 +24,16 @@ chart.show()
 
 ## Pane Options
 
-### Height Ratio
+### Stretch Factor
 
-Control relative pane sizes with `heightRatio`:
+Control relative pane sizes with `stretchFactor`:
 
 ```python
 # Price pane takes 3/4 of the height
-mainPane = chart.addPane({"heightRatio": 3})
+mainPane = chart.addPane({"stretchFactor": 3})
 
 # Volume pane takes 1/4 of the height
-volumePane = chart.addPane({"heightRatio": 1})
+volumePane = chart.addPane({"stretchFactor": 1})
 ```
 
 ## Synchronized Time Scale

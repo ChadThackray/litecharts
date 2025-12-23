@@ -32,7 +32,7 @@ volume_data = [
 chart = createChart({"width": 800, "height": 500})
 
 # Main pane (75% height)
-main_pane = chart.addPane({"heightRatio": 3})
+main_pane = chart.addPane({"stretchFactor": 3})
 candles = main_pane.addSeries(
     CandlestickSeries,
     {
@@ -46,7 +46,7 @@ candles = main_pane.addSeries(
 candles.setData(ohlc_data)
 
 # Volume pane (25% height)
-volume_pane = chart.addPane({"heightRatio": 1})
+volume_pane = chart.addPane({"stretchFactor": 1})
 volume = volume_pane.addSeries(
     HistogramSeries,
     {"priceFormat": {"type": "volume"}},

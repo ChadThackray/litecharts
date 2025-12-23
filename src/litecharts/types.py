@@ -355,7 +355,7 @@ class BaselineSeriesOptions(BaseSeriesOptions, total=False):
 class PaneOptions(TypedDict, total=False):
     """Options for chart panes."""
 
-    heightRatio: float
+    stretchFactor: float
 
 
 class MarkerTooltip(TypedDict, total=False):

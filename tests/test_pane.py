@@ -28,18 +28,18 @@ class TestPane:
 
     def test_custom_options(self) -> None:
         """Custom options are stored."""
-        pane = Pane({"heightRatio": 2.0})
-        assert pane.options["heightRatio"] == 2.0
+        pane = Pane({"stretchFactor": 2.0})
+        assert pane.options["stretchFactor"] == 2.0
 
-    def test_default_height_ratio(self) -> None:
-        """Default height ratio is 1.0."""
+    def test_default_stretch_factor(self) -> None:
+        """Default stretch factor is 1.0."""
         pane = Pane()
-        assert pane.heightRatio == 1.0
+        assert pane.stretchFactor == 1.0
 
-    def test_custom_height_ratio(self) -> None:
-        """Custom height ratio is returned."""
-        pane = Pane({"heightRatio": 0.5})
-        assert pane.heightRatio == 0.5
+    def test_custom_stretch_factor(self) -> None:
+        """Custom stretch factor is returned."""
+        pane = Pane({"stretchFactor": 0.5})
+        assert pane.stretchFactor == 0.5
 
     def test_series_initially_empty(self) -> None:
         """Series list is initially empty."""

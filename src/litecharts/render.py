@@ -15,7 +15,6 @@ from .plugins.marker_tooltips import extractMarkerTooltips, renderTooltipJs
 
 if TYPE_CHECKING:
     from .chart import Chart
-    from .pane import Pane
     from .series import BaseSeries
     from .types import OhlcInput, SingleValueInput
 
@@ -35,13 +34,13 @@ def _stripTooltipFromMarkers(
 
 
 def _renderSeriesJs(
-    series: BaseSeries[SingleValueInput] | BaseSeries[OhlcInput], chartVar: str
+    series: BaseSeries[SingleValueInput] | BaseSeries[OhlcInput], paneVar: str
 ) -> str:
     """Generate JS code for a series.
 
     Args:
         series: The series to render.
-        chartVar: The JS variable name of the parent chart.
+        paneVar: The JS variable name of the parent pane.
 
     Returns:
         JavaScript code string.
@@ -52,7 +51,7 @@ def _renderSeriesJs(
     dataJs = json.dumps(series.data)
 
     lines = [
-        f"const {seriesVar} = {chartVar}.addSeries("
+        f"const {seriesVar} = {paneVar}.addSeries("
         f"LightweightCharts.{seriesType}Series, {optionsJs});",
         f"{seriesVar}.setData({dataJs});",
     ]
@@ -75,125 +74,66 @@ def _renderSeriesJs(
     return "\n    ".join(lines)
 
 
-def _calculatePaneHeights(panes: list[Pane], totalHeight: int) -> list[int]:
-    """Calculate pixel heights for each pane based on ratios.
+def _renderContainerHtml(chart: Chart) -> str:
+    """Generate container HTML div for the chart.
 
     Args:
-        panes: List of panes.
-        totalHeight: Total available height.
+        chart: The chart to render container for.
 
     Returns:
-        List of pixel heights for each pane.
-    """
-    totalRatio = sum(p.heightRatio for p in panes)
-    heights = []
-
-    remaining = totalHeight
-    for i, pane in enumerate(panes):
-        if i == len(panes) - 1:
-            # Last pane gets remaining height to avoid rounding issues
-            heights.append(remaining)
-        else:
-            height = int(totalHeight * pane.heightRatio / totalRatio)
-            heights.append(height)
-            remaining -= height
-
-    return heights
-
-
-def _renderTimeSyncJs(chartVars: list[str]) -> str:
-    """Generate JS code to sync time scales across charts.
-
-    Args:
-        chartVars: List of chart variable names.
-
-    Returns:
-        JavaScript code string.
-    """
-    if len(chartVars) < 2:
-        return ""
-
-    lines = []
-    for i, chartVar in enumerate(chartVars):
-        otherVars = [v for j, v in enumerate(chartVars) if j != i]
-        listeners = ", ".join(
-            f"{v}.timeScale().setVisibleLogicalRange(range)" for v in otherVars
-        )
-        lines.append(
-            f"{chartVar}.timeScale().subscribeVisibleLogicalRangeChange("
-            f"range => {{ if (range) {{ {listeners}; }} }});"
-        )
-
-    return "\n    ".join(lines)
-
-
-def _renderContainerHtml(chart: Chart, heights: list[int]) -> str:
-    """Generate container HTML divs for chart panes.
-
-    Args:
-        chart: The chart to render containers for.
-        heights: Calculated heights for each pane.
-
-    Returns:
-        HTML string with container divs.
+        HTML string with container div.
     """
     containerId = f"container_{chart.id}"
-    paneDivs = []
-    for i, height in enumerate(heights):
-        paneId = f"{containerId}_pane_{i}"
-        style = f"width: {chart.width}px; height: {height}px;"
-        paneDivs.append(f'<div id="{paneId}" style="{style}"></div>')
-    paneHtml = "\n    ".join(paneDivs)
-    return f'<div id="{containerId}">\n    {paneHtml}\n</div>'
+    style = f"width: {chart.width}px; height: {chart.height}px;"
+    return f'<div id="{containerId}" style="{style}"></div>'
 
 
-def _renderChartInitScript(chart: Chart, heights: list[int]) -> str:
+def _renderChartInitScript(chart: Chart) -> str:
     """Generate the JavaScript initialization code for the chart.
+
+    Uses native LWC panes for multi-pane support. Single chart instance
+    with multiple panes provides automatic time sync and unified crosshair.
 
     Args:
         chart: The chart to render.
-        heights: Calculated heights for each pane.
 
     Returns:
         JavaScript code string (without script tags).
     """
     containerId = f"container_{chart.id}"
     panes = chart.panes
+    chartVar = f"chart_{chart.id}"
 
-    chartVars = []
-    chartJsParts = []
+    # Build chart options
+    chartOptions = dict(chart.options)
+    chartOptions["width"] = chart.width
+    chartOptions["height"] = chart.height
+    optionsJs = json.dumps(chartOptions)
 
+    jsLines = [
+        f"const {chartVar} = LightweightCharts.createChart(",
+        f"    document.getElementById('{containerId}'),",
+        f"    {optionsJs}",
+        ");",
+    ]
+
+    # Process each pane
     for i, pane in enumerate(panes):
-        # Build options for this pane
-        paneOptions = dict(chart.options)
-        paneOptions["width"] = chart.width
-        paneOptions["height"] = heights[i]
+        paneVar = f"pane_{pane.id}"
 
-        # Hide time scale on all but last pane for cleaner stacking
-        if i < len(panes) - 1:
-            existingTs = paneOptions.get("timeScale")
-            if existingTs:
-                timeScale = {**cast(dict[str, object], existingTs), "visible": False}
-            else:
-                timeScale = {"visible": False}
-            paneOptions["timeScale"] = timeScale
+        if i == 0:
+            # First pane - get reference to auto-created pane 0
+            jsLines.append(f"const {paneVar} = {chartVar}.panes()[0];")
+        else:
+            # Additional panes - create via addPane()
+            jsLines.append(f"const {paneVar} = {chartVar}.addPane();")
 
-        chartVar = f"chart_{pane.id}"
-        chartVars.append(chartVar)
-        paneContainer = f"{containerId}_pane_{i}"
+        # Set stretch factor for proportional sizing
+        jsLines.append(f"{paneVar}.setStretchFactor({pane.stretchFactor});")
 
-        optionsJs = json.dumps(paneOptions)
-
-        jsLines = [
-            f"const {chartVar} = LightweightCharts.createChart(",
-            f"      document.getElementById('{paneContainer}'),",
-            f"      {optionsJs}",
-            "    );",
-        ]
-
-        # Add series
+        # Add series to this pane
         for series in pane.series:
-            jsLines.append(_renderSeriesJs(series, chartVar))
+            jsLines.append(_renderSeriesJs(series, paneVar))
 
             # Add rectangles if any (plugin)
             rectangles = extractRectangles(series)
@@ -203,25 +143,15 @@ def _renderChartInitScript(chart: Chart, heights: list[int]) -> str:
         # Add marker tooltips if any markers have tooltip data (plugin)
         tooltips = extractMarkerTooltips(pane)
         if tooltips:
-            jsLines.append(renderTooltipJs(chartVar, paneContainer, tooltips))
+            jsLines.append(renderTooltipJs(chartVar, containerId, tooltips))
 
-        chartJsParts.append("\n    ".join(jsLines))
-
-    # Time sync
-    syncJs = _renderTimeSyncJs(chartVars)
-
-    # Combine all JS
-    allChartJs = "\n\n    ".join(chartJsParts)
-    if syncJs:
-        allChartJs += f"\n\n    // Sync time scales\n    {syncJs}"
-
-    return allChartJs
+    return "\n    ".join(jsLines)
 
 
 def renderFragment(chart: Chart) -> str:
     """Render a chart fragment for embedding in custom HTML.
 
-    Returns container divs and init script, but NOT:
+    Returns container div and init script, but NOT:
     - DOCTYPE/html/head/body wrapper
     - LWC library (use getLwcScript() separately)
     - Plugin scripts (use getPluginScripts() separately)
@@ -241,9 +171,8 @@ def renderFragment(chart: Chart) -> str:
     <p>No data to display</p>
 </div>'''
 
-    heights = _calculatePaneHeights(panes, chart.height)
-    containerHtml = _renderContainerHtml(chart, heights)
-    initScript = _renderChartInitScript(chart, heights)
+    containerHtml = _renderContainerHtml(chart)
+    initScript = _renderChartInitScript(chart)
 
     return f"""{containerHtml}
 <script>
@@ -278,14 +207,11 @@ def renderChart(chart: Chart) -> str:
 </body>
 </html>"""
 
-    # Calculate heights
-    heights = _calculatePaneHeights(panes, chart.height)
-
     # Build container HTML
-    containerHtml = _renderContainerHtml(chart, heights)
+    containerHtml = _renderContainerHtml(chart)
 
     # Build chart JS
-    allChartJs = _renderChartInitScript(chart, heights)
+    allChartJs = _renderChartInitScript(chart)
 
     # Check if any series has rectangles (to include primitive class)
     hasRectangles = any(series.rectangles for pane in panes for series in pane.series)
@@ -302,10 +228,6 @@ def renderChart(chart: Chart) -> str:
             margin: 0;
             padding: 20px;
             background: #1e1e1e;
-        }}
-        #{containerId} {{
-            display: flex;
-            flex-direction: column;
         }}
     </style>
 </head>
