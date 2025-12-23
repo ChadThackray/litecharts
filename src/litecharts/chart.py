@@ -213,6 +213,45 @@ class Chart:
 
         return renderChart(self)
 
+    def toFragment(self) -> str:
+        """Generate an HTML fragment for embedding in custom pages.
+
+        Returns container divs and initialization script, but NOT the LWC library
+        or full HTML document wrapper. Use with getLwcScript() and getPluginScripts()
+        for dashboards with multiple charts.
+
+        Example::
+
+            from litecharts import (
+                createChart, getLwcScript, getPluginScripts, CandlestickSeries
+            )
+
+            chart1 = createChart()
+            chart1.addSeries(CandlestickSeries).setData(data1)
+
+            chart2 = createChart()
+            chart2.addSeries(CandlestickSeries).setData(data2)
+
+            html = f'''
+            <html>
+            <head>
+                {getLwcScript()}
+                {getPluginScripts()}
+            </head>
+            <body>
+                {chart1.toFragment()}
+                {chart2.toFragment()}
+            </body>
+            </html>
+            '''
+
+        Returns:
+            HTML fragment string.
+        """
+        from .render import renderFragment
+
+        return renderFragment(self)
+
     def show(self) -> None:
         """Display the chart.
 

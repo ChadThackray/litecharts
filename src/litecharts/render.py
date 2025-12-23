@@ -127,45 +127,39 @@ def _renderTimeSyncJs(chartVars: list[str]) -> str:
     return "\n    ".join(lines)
 
 
-def renderChart(chart: Chart) -> str:
-    """Render a chart to self-contained HTML.
+def _renderContainerHtml(chart: Chart, heights: list[int]) -> str:
+    """Generate container HTML divs for chart panes.
 
     Args:
-        chart: The chart to render.
+        chart: The chart to render containers for.
+        heights: Calculated heights for each pane.
 
     Returns:
-        HTML string.
+        HTML string with container divs.
     """
     containerId = f"container_{chart.id}"
-    lwcJs = getLwcJs()
-
-    panes = chart.panes
-    if not panes:
-        # No panes, no chart to render
-        return f"""<!DOCTYPE html>
-<html>
-<head>
-    <title>Chart</title>
-</head>
-<body>
-    <div id="{containerId}" style="width: {chart.width}px; height: {chart.height}px;">
-        <p>No data to display</p>
-    </div>
-</body>
-</html>"""
-
-    # Calculate heights
-    heights = _calculatePaneHeights(panes, chart.height)
-
-    # Build container HTML
     paneDivs = []
     for i, height in enumerate(heights):
         paneId = f"{containerId}_pane_{i}"
         style = f"width: {chart.width}px; height: {height}px;"
         paneDivs.append(f'<div id="{paneId}" style="{style}"></div>')
-    paneHtml = "\n        ".join(paneDivs)
+    paneHtml = "\n    ".join(paneDivs)
+    return f'<div id="{containerId}">\n    {paneHtml}\n</div>'
 
-    # Build chart JS
+
+def _renderChartInitScript(chart: Chart, heights: list[int]) -> str:
+    """Generate the JavaScript initialization code for the chart.
+
+    Args:
+        chart: The chart to render.
+        heights: Calculated heights for each pane.
+
+    Returns:
+        JavaScript code string (without script tags).
+    """
+    containerId = f"container_{chart.id}"
+    panes = chart.panes
+
     chartVars = []
     chartJsParts = []
 
@@ -216,16 +210,88 @@ def renderChart(chart: Chart) -> str:
     # Time sync
     syncJs = _renderTimeSyncJs(chartVars)
 
+    # Combine all JS
+    allChartJs = "\n\n    ".join(chartJsParts)
+    if syncJs:
+        allChartJs += f"\n\n    // Sync time scales\n    {syncJs}"
+
+    return allChartJs
+
+
+def renderFragment(chart: Chart) -> str:
+    """Render a chart fragment for embedding in custom HTML.
+
+    Returns container divs and init script, but NOT:
+    - DOCTYPE/html/head/body wrapper
+    - LWC library (use getLwcScript() separately)
+    - Plugin scripts (use getPluginScripts() separately)
+
+    Args:
+        chart: The chart to render.
+
+    Returns:
+        HTML fragment string with container and script.
+    """
+    containerId = f"container_{chart.id}"
+    panes = chart.panes
+
+    if not panes:
+        style = f"width: {chart.width}px; height: {chart.height}px;"
+        return f'''<div id="{containerId}" style="{style}">
+    <p>No data to display</p>
+</div>'''
+
+    heights = _calculatePaneHeights(panes, chart.height)
+    containerHtml = _renderContainerHtml(chart, heights)
+    initScript = _renderChartInitScript(chart, heights)
+
+    return f"""{containerHtml}
+<script>
+{initScript}
+</script>"""
+
+
+def renderChart(chart: Chart) -> str:
+    """Render a chart to self-contained HTML.
+
+    Args:
+        chart: The chart to render.
+
+    Returns:
+        HTML string.
+    """
+    containerId = f"container_{chart.id}"
+    lwcJs = getLwcJs()
+
+    panes = chart.panes
+    if not panes:
+        # No panes, no chart to render
+        return f"""<!DOCTYPE html>
+<html>
+<head>
+    <title>Chart</title>
+</head>
+<body>
+    <div id="{containerId}" style="width: {chart.width}px; height: {chart.height}px;">
+        <p>No data to display</p>
+    </div>
+</body>
+</html>"""
+
+    # Calculate heights
+    heights = _calculatePaneHeights(panes, chart.height)
+
+    # Build container HTML
+    containerHtml = _renderContainerHtml(chart, heights)
+
+    # Build chart JS
+    allChartJs = _renderChartInitScript(chart, heights)
+
     # Check if any series has rectangles (to include primitive class)
     hasRectangles = any(series.rectangles for pane in panes for series in pane.series)
     rectangleScript = (
         f"\n    <script>{RECTANGLE_PRIMITIVE_JS}</script>" if hasRectangles else ""
     )
-
-    # Combine all JS
-    allChartJs = "\n\n    ".join(chartJsParts)
-    if syncJs:
-        allChartJs += f"\n\n    // Sync time scales\n    {syncJs}"
 
     return f"""<!DOCTYPE html>
 <html>
@@ -244,9 +310,7 @@ def renderChart(chart: Chart) -> str:
     </style>
 </head>
 <body>
-    <div id="{containerId}">
-        {paneHtml}
-    </div>
+    {containerHtml}
     <script>{lwcJs}</script>{rectangleScript}
     <script>
     {allChartJs}

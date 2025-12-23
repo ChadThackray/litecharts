@@ -1,5 +1,6 @@
 """Litecharts - Python wrapper for TradingView Lightweight Charts."""
 
+from ._js import getDefaultStyles, getLwcScript, getPluginScripts
 from .chart import Chart, createChart
 from .pane import Pane
 from .series import (
@@ -97,4 +98,7 @@ __all__ = [
     "WatermarkOptions",
     "createChart",
     "createSeriesMarkers",
+    "getDefaultStyles",
+    "getLwcScript",
+    "getPluginScripts",
 ]

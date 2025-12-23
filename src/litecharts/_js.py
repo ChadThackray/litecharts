@@ -27,3 +27,47 @@ def getLwcJs() -> str:
             "Try reinstalling: pip install --force-reinstall litecharts"
         )
         raise FileNotFoundError(msg) from None
+
+
+def getLwcScript() -> str:
+    """Get the LWC library wrapped in a script tag.
+
+    Use this once per page when rendering multiple chart fragments.
+    Include in <head> before any chart fragments.
+
+    Returns:
+        HTML script tag containing the LWC library.
+    """
+    return f"<script>{getLwcJs()}</script>"
+
+
+def getPluginScripts() -> str:
+    """Get all plugin scripts wrapped in script tags.
+
+    Use this once per page when rendering chart fragments that may use plugins.
+    Include in <head> after getLwcScript() and before any chart fragments.
+
+    Returns:
+        HTML script tags containing all plugin code.
+    """
+    from .plugins.draw_rectangle import RECTANGLE_PRIMITIVE_JS
+
+    return f"<script>{RECTANGLE_PRIMITIVE_JS}</script>"
+
+
+def getDefaultStyles(containerId: str) -> str:
+    """Get default CSS styles for a chart container.
+
+    Returns container-scoped styles only (flexbox for pane stacking).
+    Does not include body-level styles.
+
+    Args:
+        containerId: The chart container ID (e.g., chart.id).
+
+    Returns:
+        CSS rules for the container.
+    """
+    return f"""#container_{containerId} {{
+    display: flex;
+    flex-direction: column;
+}}"""
