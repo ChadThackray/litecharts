@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "litecharts"
-version = "0.1.2"
+version = "0.1.3"
 description = "Python wrapper for TradingView Lightweight Charts"
 readme = "README.md"
 license = "MIT"
@@ -47,6 +47,7 @@ include = [
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/litecharts"]
+artifacts = ["src/litecharts/js/*.js"]
 
 [tool.hatch.build.hooks.custom]
 path = "build_hooks.py"
