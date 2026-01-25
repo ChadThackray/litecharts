@@ -214,6 +214,7 @@ class ChartOptions(TypedDict, total=False):
     kineticScroll: KineticScrollOptions
     localization: LocalizationOptions
     watermark: WatermarkOptions
+    padding: int
 
 
 class PriceLineOptions(TypedDict, total=False):
