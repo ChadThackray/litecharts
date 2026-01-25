@@ -83,6 +83,14 @@ class Chart:
         return 800
 
     @property
+    def padding(self) -> int:
+        """Return the chart padding."""
+        result = self._options.get("padding", 20)
+        if isinstance(result, int):
+            return result
+        return 20
+
+    @property
     def height(self) -> int:
         """Return the chart height."""
         result = self._options.get("height", 600)

@@ -226,7 +226,7 @@ def renderChart(chart: Chart) -> str:
     <style>
         body {{
             margin: 0;
-            padding: 20px;
+            padding: {chart.padding}px;
             background: #1e1e1e;
         }}
     </style>
