@@ -145,6 +145,9 @@ def _renderChartInitScript(chart: Chart) -> str:
         if tooltips:
             jsLines.append(renderTooltipJs(chartVar, containerId, tooltips))
 
+    # Fit content to timescal
+    jsLines.append(f"{chartVar}.timeScale().fitContent();")
+
     return "\n    ".join(jsLines)
 
 
@@ -226,7 +229,7 @@ def renderChart(chart: Chart) -> str:
     <style>
         body {{
             margin: 0;
-            padding: 20px;
+            padding: {chart.padding}px;
             background: #1e1e1e;
         }}
     </style>
