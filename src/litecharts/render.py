@@ -145,6 +145,9 @@ def _renderChartInitScript(chart: Chart) -> str:
         if tooltips:
             jsLines.append(renderTooltipJs(chartVar, containerId, tooltips))
 
+    # Fit content to timescal
+    jsLines.append(f"{chartVar}.timeScale().fitContent();")
+
     return "\n    ".join(jsLines)
 
 
