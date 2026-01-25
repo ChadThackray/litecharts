@@ -295,7 +295,6 @@ def createSeriesMarkers(
     """
     from .convert import toUnixTimestamp
 
-    series._markers = []
     for marker in markers:
         normalized: Marker = marker.copy()
         if "time" in normalized:
