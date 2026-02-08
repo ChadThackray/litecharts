@@ -58,6 +58,7 @@ class Chart:
         self._options: ChartOptions = options.copy() if options else {}
         self._panes: list[Pane] = []
         self._defaultPane: Pane | None = None
+        self._fitContent: bool = False
 
     @property
     def id(self) -> str:
@@ -89,6 +90,21 @@ class Chart:
         if isinstance(result, int):
             return result
         return 600
+
+    @property
+    def shouldFitContent(self) -> bool:
+        """Return whether fitContent should be called on render."""
+        return self._fitContent
+
+    def fitContent(self) -> None:
+        """Fit all data into the visible time range on render.
+
+        Calls timeScale().fitContent() in the generated JS, which adjusts
+        the visible range to show all data points. Best for small/medium
+        datasets. For large datasets, the default behavior (anchored to
+        the right edge with reasonable bar spacing) may be preferable.
+        """
+        self._fitContent = True
 
     def _getDefaultPane(self) -> Pane:
         """Get or create the default pane."""
