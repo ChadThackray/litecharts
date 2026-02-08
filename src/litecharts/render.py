@@ -16,7 +16,7 @@ from .plugins.marker_tooltips import extractMarkerTooltips, renderTooltipJs
 if TYPE_CHECKING:
     from .chart import Chart
     from .series import BaseSeries
-    from .types import OhlcInput, SingleValueInput
+    from .types import OhlcInput, SingleValueInput, StyleOptions
 
 
 def _stripTooltipFromMarkers(
@@ -180,11 +180,12 @@ def renderFragment(chart: Chart) -> str:
 </script>"""
 
 
-def renderChart(chart: Chart) -> str:
+def renderChart(chart: Chart, style: StyleOptions | None = None) -> str:
     """Render a chart to self-contained HTML.
 
     Args:
         chart: The chart to render.
+        style: Optional HTML document styling options.
 
     Returns:
         HTML string.
@@ -226,7 +227,7 @@ def renderChart(chart: Chart) -> str:
     <style>
         body {{
             margin: 0;
-            padding: 20px;
+            padding: {style.get("padding", 20) if style else 20}px;
             background: #1e1e1e;
         }}
     </style>

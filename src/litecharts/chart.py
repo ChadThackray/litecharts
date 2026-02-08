@@ -29,6 +29,7 @@ if TYPE_CHECKING:
         OhlcInput,
         PaneOptions,
         SingleValueInput,
+        StyleOptions,
     )
 
 
@@ -203,15 +204,18 @@ class Chart:
 
         return pane.addSeries(seriesType, options)  # type: ignore[arg-type]
 
-    def toHtml(self) -> str:
+    def toHtml(self, style: StyleOptions | None = None) -> str:
         """Generate self-contained HTML for the chart.
+
+        Args:
+            style: Optional HTML document styling options.
 
         Returns:
             HTML string.
         """
         from .render import renderChart
 
-        return renderChart(self)
+        return renderChart(self, style)
 
     def toFragment(self) -> str:
         """Generate an HTML fragment for embedding in custom pages.
@@ -252,44 +256,56 @@ class Chart:
 
         return renderFragment(self)
 
-    def show(self) -> None:
+    def show(self, style: StyleOptions | None = None) -> None:
         """Display the chart.
 
         Auto-detects environment: uses Jupyter inline display if in a notebook,
         otherwise opens in a browser.
+
+        Args:
+            style: Optional HTML document styling options.
         """
         if _inJupyter():
-            self.showNotebook()
+            self.showNotebook(style)
         else:
-            self.showBrowser()
+            self.showBrowser(style)
 
-    def showNotebook(self) -> None:
-        """Display the chart inline in a Jupyter notebook."""
+    def showNotebook(self, style: StyleOptions | None = None) -> None:
+        """Display the chart inline in a Jupyter notebook.
+
+        Args:
+            style: Optional HTML document styling options.
+        """
         from IPython.display import HTML, display
 
-        display(HTML(self.toHtml()))  # type: ignore[no-untyped-call]
+        display(HTML(self.toHtml(style)))  # type: ignore[no-untyped-call]
 
-    def showBrowser(self) -> None:
-        """Open the chart in the default web browser."""
+    def showBrowser(self, style: StyleOptions | None = None) -> None:
+        """Open the chart in the default web browser.
+
+        Args:
+            style: Optional HTML document styling options.
+        """
         import tempfile
         import webbrowser
 
         with tempfile.NamedTemporaryFile(
             mode="w", suffix=".html", delete=False, encoding="utf-8"
         ) as f:
-            f.write(self.toHtml())
+            f.write(self.toHtml(style))
             temp_path = f.name
 
         webbrowser.open(f"file://{temp_path}")
 
-    def save(self, path: str | Path) -> None:
+    def save(self, path: str | Path, style: StyleOptions | None = None) -> None:
         """Save the chart to an HTML file.
 
         Args:
             path: File path to save to.
+            style: Optional HTML document styling options.
         """
         path = Path(path)
-        path.write_text(self.toHtml(), encoding="utf-8")
+        path.write_text(self.toHtml(style), encoding="utf-8")
 
 
 def createChart(options: ChartOptions | None = None) -> Chart:
