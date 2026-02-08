@@ -9,6 +9,7 @@ from litecharts.series import (
     CandlestickSeries,
     HistogramSeries,
     LineSeries,
+    SeriesMarkersApi,
     createSeriesMarkers,
 )
 
@@ -92,6 +93,105 @@ class TestCandlestickSeries:
         assert series.markers[0]["id"] == "trade-1"
         assert series.markers[0]["tooltip"]["title"] == "Sell Signal"
         assert series.markers[0]["tooltip"]["fields"]["PnL"] == "+$50"
+
+
+class TestSeriesMarkersApi:
+    """Tests for the handle-based marker API (SeriesMarkersApi)."""
+
+    def test_returns_handle(self) -> None:
+        """createSeriesMarkers returns a SeriesMarkersApi handle."""
+        series = CandlestickSeries()
+        handle = createSeriesMarkers(
+            series, [{"time": 1609459200, "position": "aboveBar", "shape": "circle"}]
+        )
+        assert isinstance(handle, SeriesMarkersApi)
+
+    def test_handle_markers(self) -> None:
+        """handle.markers() returns the group's markers."""
+        series = CandlestickSeries()
+        handle = createSeriesMarkers(
+            series, [{"time": 1609459200, "position": "aboveBar", "shape": "circle"}]
+        )
+        assert len(handle.markers()) == 1
+        assert handle.markers()[0]["time"] == 1609459200
+
+    def test_handle_set_markers(self) -> None:
+        """handle.setMarkers() replaces the group's markers."""
+        series = CandlestickSeries()
+        handle = createSeriesMarkers(
+            series, [{"time": 1609459200, "position": "aboveBar", "shape": "circle"}]
+        )
+        handle.setMarkers(
+            [{"time": 1609545600, "position": "belowBar", "shape": "arrowUp"}]
+        )
+        assert len(handle.markers()) == 1
+        assert handle.markers()[0]["time"] == 1609545600
+        assert series.markers[0]["time"] == 1609545600
+
+    def test_handle_detach(self) -> None:
+        """handle.detach() removes the group from the series."""
+        series = CandlestickSeries()
+        handle = createSeriesMarkers(
+            series, [{"time": 1609459200, "position": "aboveBar", "shape": "circle"}]
+        )
+        assert len(series.markers) == 1
+        handle.detach()
+        assert len(series.markers) == 0
+        assert len(series.markerGroups) == 0
+
+    def test_handle_detach_idempotent(self) -> None:
+        """handle.detach() is idempotent — calling twice does not raise."""
+        series = CandlestickSeries()
+        handle = createSeriesMarkers(
+            series, [{"time": 1609459200, "position": "aboveBar", "shape": "circle"}]
+        )
+        handle.detach()
+        handle.detach()  # should not raise
+        assert len(series.markerGroups) == 0
+
+    def test_multiple_groups_independent(self) -> None:
+        """Multiple createSeriesMarkers calls create independent groups."""
+        series = CandlestickSeries()
+        h1 = createSeriesMarkers(
+            series, [{"time": 1609459200, "position": "aboveBar", "shape": "circle"}]
+        )
+        h2 = createSeriesMarkers(
+            series, [{"time": 1609545600, "position": "belowBar", "shape": "arrowUp"}]
+        )
+        assert len(series.markerGroups) == 2
+        assert len(series.markers) == 2
+        assert h1.markers()[0]["time"] == 1609459200
+        assert h2.markers()[0]["time"] == 1609545600
+
+    def test_detach_one_preserves_other(self) -> None:
+        """Detaching one group preserves the other."""
+        series = CandlestickSeries()
+        h1 = createSeriesMarkers(
+            series, [{"time": 1609459200, "position": "aboveBar", "shape": "circle"}]
+        )
+        h2 = createSeriesMarkers(
+            series, [{"time": 1609545600, "position": "belowBar", "shape": "arrowUp"}]
+        )
+        h1.detach()
+        assert len(series.markerGroups) == 1
+        assert len(series.markers) == 1
+        assert series.markers[0]["time"] == 1609545600
+        assert h2.markers()[0]["time"] == 1609545600
+
+    def test_flattened_markers_across_groups(self) -> None:
+        """series.markers returns all markers flattened across groups."""
+        series = CandlestickSeries()
+        createSeriesMarkers(
+            series,
+            [
+                {"time": 1609459200, "position": "aboveBar", "shape": "circle"},
+                {"time": 1609545600, "position": "aboveBar", "shape": "circle"},
+            ],
+        )
+        createSeriesMarkers(
+            series, [{"time": 1609632000, "position": "belowBar", "shape": "arrowUp"}]
+        )
+        assert len(series.markers) == 3
 
 
 class TestLineSeries:

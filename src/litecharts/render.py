@@ -56,10 +56,9 @@ def _renderSeriesJs(
         f"{seriesVar}.setData({dataJs});",
     ]
 
-    if series.markers:
-        # Strip tooltip field before sending to LWC (it's handled separately)
+    for group in series.markerGroups:
         markersForLwc = _stripTooltipFromMarkers(
-            cast(list[dict[str, object]], series.markers)
+            cast(list[dict[str, object]], group.markers())
         )
         markersJs = json.dumps(markersForLwc)
         lines.append(

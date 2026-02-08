@@ -379,3 +379,57 @@ class TestHtmlOutputRegression:
 
         html = chart.toHtml()
         hash_checker("chart_with_rectangles", html)
+
+    def test_chart_with_multiple_marker_groups_html(
+        self,
+        sample_ohlc_dicts: list[DataMapping],
+        hash_checker: Callable[[str, str], None],
+    ) -> None:
+        """Chart with multiple independent marker groups HTML output is stable."""
+        chart = Chart()
+        chart._id = "chart_test0009"
+        pane = chart.addPane()
+        pane._id = "pane_test0009"
+        series = pane.addSeries(CandlestickSeries)
+        series._id = "series_test0009"
+        series.setData(sample_ohlc_dicts)
+
+        # First marker group: sell signals
+        createSeriesMarkers(
+            series,
+            [
+                {
+                    "time": 1609459200,
+                    "position": "aboveBar",
+                    "shape": "arrowDown",
+                    "color": "#f44336",
+                    "text": "Sell",
+                    "id": "sell-1",
+                    "tooltip": {
+                        "title": "Sell Signal",
+                        "fields": {"Price": "$105", "PnL": "+$10"},
+                    },
+                },
+            ],
+        )
+        # Second marker group: buy signals
+        createSeriesMarkers(
+            series,
+            [
+                {
+                    "time": 1609632000,
+                    "position": "belowBar",
+                    "shape": "arrowUp",
+                    "color": "#4caf50",
+                    "text": "Buy",
+                    "id": "buy-1",
+                    "tooltip": {
+                        "title": "Buy Signal",
+                        "fields": {"Price": "$115", "Size": "100"},
+                    },
+                },
+            ],
+        )
+
+        html = chart.toHtml()
+        hash_checker("chart_with_multiple_marker_groups", html)
