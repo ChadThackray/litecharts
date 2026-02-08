@@ -47,6 +47,7 @@ from .types import (
     PriceScaleOptions,
     RectangleOptions,
     SingleValueData,
+    StyleOptions,
     TimeScaleOptions,
     WatermarkOptions,
 )
@@ -96,6 +97,7 @@ __all__ = [
     "RectangleOptions",
     "SeriesMarkersApi",
     "SingleValueData",
+    "StyleOptions",
     "TimeScaleOptions",
     "WatermarkOptions",
     "createChart",

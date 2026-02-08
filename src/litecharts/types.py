@@ -216,6 +216,17 @@ class ChartOptions(TypedDict, total=False):
     watermark: WatermarkOptions
 
 
+class StyleOptions(TypedDict, total=False):
+    """Options for HTML document styling in renderChart/toHtml.
+
+    These options control the surrounding HTML document styles,
+    not the LWC chart itself. Only applies to full HTML rendering
+    (toHtml), not fragments (toFragment).
+    """
+
+    padding: int
+
+
 class PriceLineOptions(TypedDict, total=False):
     """Options for price lines."""
 
