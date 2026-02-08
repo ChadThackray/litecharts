@@ -28,6 +28,57 @@ if TYPE_CHECKING:
 DataInputT = TypeVar("DataInputT", SingleValueInput, OhlcInput)
 
 
+class SeriesMarkersApi:
+    """Handle for an independent marker group on a series.
+
+    Mirrors LWC's ``ISeriesMarkersPluginApi`` — each call to
+    ``createSeriesMarkers()`` creates one of these, giving the caller
+    ``setMarkers()``, ``markers()``, and ``detach()`` methods to manage
+    that group independently.
+    """
+
+    def __init__(
+        self,
+        series: BaseSeries[SingleValueInput] | BaseSeries[OhlcInput],
+        markers: list[Marker],
+    ) -> None:
+        self._series = series
+        self._markers: list[Marker] = markers
+
+    def setMarkers(self, markers: list[Marker]) -> None:
+        """Replace this group's markers.
+
+        Mirrors ``ISeriesMarkersPluginApi.setMarkers()``.
+
+        Args:
+            markers: New list of marker dicts (timestamps are normalised).
+        """
+        from .convert import toUnixTimestamp
+
+        normalised: list[Marker] = []
+        for marker in markers:
+            m: Marker = marker.copy()
+            if "time" in m:
+                m["time"] = toUnixTimestamp(m["time"])
+            normalised.append(m)
+        self._markers = normalised
+
+    def markers(self) -> list[Marker]:
+        """Return this group's markers.
+
+        Mirrors ``ISeriesMarkersPluginApi.markers()``.
+        """
+        return self._markers
+
+    def detach(self) -> None:
+        """Remove this group from the parent series. Idempotent.
+
+        Mirrors ``ISeriesMarkersPluginApi.detach()``.
+        """
+        if self in self._series._markerGroups:
+            self._series._markerGroups.remove(self)
+
+
 class BaseSeries(ABC, Generic[DataInputT]):
     """Base class for all series types."""
 
@@ -42,7 +93,7 @@ class BaseSeries(ABC, Generic[DataInputT]):
         self._id = f"series_{uuid.uuid4().hex[:8]}"
         self._options: BaseSeriesOptions = options.copy() if options else {}
         self._data: list[OhlcData | SingleValueData] = []
-        self._markers: list[Marker] = []
+        self._markerGroups: list[SeriesMarkersApi] = []
         self._priceLines: list[PriceLineOptions] = []
         self._rectangles: list[RectangleOptions] = []
 
@@ -68,8 +119,13 @@ class BaseSeries(ABC, Generic[DataInputT]):
 
     @property
     def markers(self) -> list[Marker]:
-        """Return the series markers."""
-        return self._markers
+        """Return all markers flattened across all groups (read-only view)."""
+        return [m for group in self._markerGroups for m in group.markers()]
+
+    @property
+    def markerGroups(self) -> list[SeriesMarkersApi]:
+        """Return the list of marker group handles."""
+        return self._markerGroups
 
     @property
     def priceLines(self) -> list[PriceLineOptions]:
@@ -275,29 +331,39 @@ class BaselineSeries(BaseSeries[SingleValueInput]):
 def createSeriesMarkers(
     series: BaseSeries[SingleValueInput] | BaseSeries[OhlcInput],
     markers: list[Marker],
-) -> None:
-    """Create markers on a series.
+) -> SeriesMarkersApi:
+    """Create an independent marker group on a series and return a handle.
 
-    This mirrors the LWC v5 API pattern where markers are created via
-    a separate function rather than a method on the series.
+    Each call creates a new ``SeriesMarkersApi`` (mirroring LWC's
+    ``ISeriesMarkersPluginApi``).  Multiple calls produce independent
+    groups that are all rendered.
 
     Args:
         series: The series to add markers to.
         markers: List of marker dicts.
 
+    Returns:
+        A ``SeriesMarkersApi`` handle for managing this marker group.
+
     Example:
         >>> series = chart.addSeries(CandlestickSeries)
         >>> series.setData(ohlcData)
-        >>> createSeriesMarkers(series, [
+        >>> handle = createSeriesMarkers(series, [
         ...     {"time": 1609459200, "position": "aboveBar", "shape": "arrowDown",
         ...      "color": "#f44336", "text": "Sell"}
         ... ])
+        >>> handle.markers()   # read back
+        >>> handle.detach()    # remove this group
     """
     from .convert import toUnixTimestamp
 
-    series._markers = []
+    normalised: list[Marker] = []
     for marker in markers:
-        normalized: Marker = marker.copy()
-        if "time" in normalized:
-            normalized["time"] = toUnixTimestamp(normalized["time"])
-        series._markers.append(normalized)
+        m: Marker = marker.copy()
+        if "time" in m:
+            m["time"] = toUnixTimestamp(m["time"])
+        normalised.append(m)
+
+    handle = SeriesMarkersApi(series, normalised)
+    series._markerGroups.append(handle)
+    return handle

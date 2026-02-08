@@ -11,6 +11,7 @@ from .series import (
     CandlestickSeries,
     HistogramSeries,
     LineSeries,
+    SeriesMarkersApi,
     createSeriesMarkers,
 )
 from .types import (
@@ -93,6 +94,7 @@ __all__ = [
     "PriceScaleMargins",
     "PriceScaleOptions",
     "RectangleOptions",
+    "SeriesMarkersApi",
     "SingleValueData",
     "TimeScaleOptions",
     "WatermarkOptions",

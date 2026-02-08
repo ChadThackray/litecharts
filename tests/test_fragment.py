@@ -118,7 +118,7 @@ class TestToFragment:
                     "position": "aboveBar",
                     "shape": "arrowDown",
                     "color": "#f44336",
-                    "tooltip": {"title": "Signal", "body": "Buy signal"},
+                    "tooltip": {"title": "Signal", "fields": {"Action": "Buy signal"}},
                 }
             ],
         )
@@ -133,10 +133,12 @@ class TestToFragment:
         pane1 = chart.addPane()
         pane1.addSeries(CandlestickSeries).setData(sample_ohlc_dicts)
         pane2 = chart.addPane()
-        pane2.addSeries(LineSeries).setData([
-            {"time": 1609459200, "value": 100.0},
-            {"time": 1609545600, "value": 110.0},
-        ])
+        pane2.addSeries(LineSeries).setData(
+            [
+                {"time": 1609459200, "value": 100.0},
+                {"time": 1609545600, "value": 110.0},
+            ]
+        )
         fragment = chart.toFragment()
         # Native panes don't need manual time sync
         assert "subscribeVisibleLogicalRangeChange" not in fragment
@@ -218,10 +220,12 @@ class TestFragmentIntegration:
         chart1.addSeries(CandlestickSeries).setData(sample_ohlc_dicts)
 
         chart2 = createChart({"width": 400, "height": 300})
-        chart2.addSeries(LineSeries).setData([
-            {"time": 1609459200, "value": 100.0},
-            {"time": 1609545600, "value": 110.0},
-        ])
+        chart2.addSeries(LineSeries).setData(
+            [
+                {"time": 1609459200, "value": 100.0},
+                {"time": 1609545600, "value": 110.0},
+            ]
+        )
 
         html = f"""<!DOCTYPE html>
 <html>
