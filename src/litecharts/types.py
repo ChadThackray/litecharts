@@ -225,6 +225,7 @@ class StyleOptions(TypedDict, total=False):
     """
 
     padding: int
+    background: str
 
 
 class PriceLineOptions(TypedDict, total=False):

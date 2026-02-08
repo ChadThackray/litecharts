@@ -53,7 +53,8 @@ def load_and_run_example(example_path: Path) -> str:
     if captured_chart is None:
         raise RuntimeError(f"No chart was created in {example_path}")
 
-    return captured_chart.toHtml()  # type: ignore[union-attr]
+    captured_chart._options["autoSize"] = True  # type: ignore[union-attr]
+    return captured_chart.toHtml(style={"padding": 12, "background": "transparent"})  # type: ignore[union-attr]
 
 
 def main() -> None:

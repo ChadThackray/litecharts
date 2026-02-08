@@ -83,7 +83,10 @@ def _renderContainerHtml(chart: Chart) -> str:
         HTML string with container div.
     """
     containerId = f"container_{chart.id}"
-    style = f"width: {chart.width}px; height: {chart.height}px;"
+    if chart.options.get("autoSize"):
+        style = f"width: 100%; height: {chart.height}px;"
+    else:
+        style = f"width: {chart.width}px; height: {chart.height}px;"
     return f'<div id="{containerId}" style="{style}"></div>'
 
 
@@ -231,7 +234,7 @@ def renderChart(chart: Chart, style: StyleOptions | None = None) -> str:
         body {{
             margin: 0;
             padding: {style.get("padding", 20) if style else 20}px;
-            background: #1e1e1e;
+            background: {style.get("background", "#1e1e1e") if style else "#1e1e1e"};
         }}
     </style>
 </head>

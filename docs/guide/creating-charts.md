@@ -60,6 +60,23 @@ Save directly to a file:
 chart.save("chart.html")
 ```
 
+## Style Options
+
+Control the HTML document wrapper styling with the `style` parameter:
+
+```python
+# Remove default padding (default is 20px)
+chart.show(style={"padding": 0})
+
+# Also works with save() and toHtml()
+chart.save("chart.html", style={"padding": 0})
+html = chart.toHtml(style={"padding": 0})
+```
+
+::: tip
+Style options affect the HTML document wrapper, not the chart itself. They have no effect on `toFragment()` since fragments don't include a document wrapper.
+:::
+
 ## Dashboard / Multi-Chart Pages
 
 For dashboards with multiple charts, use `toFragment()` to avoid duplicating

@@ -37,3 +37,4 @@ chart.show()  # Auto-detects Jupyter or opens browser
 - Learn about [different series types](/guide/series-types)
 - See how to use [Pandas DataFrames](/guide/data-formats)
 - Create [multi-pane layouts](/guide/multi-pane)
+- Add [markers](/guide/markers) for buy/sell signals

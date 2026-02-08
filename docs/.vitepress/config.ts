@@ -37,6 +37,7 @@ export default defineConfig({
         text: 'Advanced',
         items: [
           { text: 'Multi-Pane Charts', link: '/guide/multi-pane' },
+          { text: 'Markers', link: '/guide/markers' },
           { text: 'Customization', link: '/guide/customization' },
         ]
       },
@@ -46,6 +47,7 @@ export default defineConfig({
           { text: 'Basic Chart', link: '/examples/basic' },
           { text: 'Multi-Pane', link: '/examples/multi-pane' },
           { text: 'Overlay', link: '/examples/pandas' },
+          { text: 'Markers', link: '/examples/markers' },
         ]
       },
     ],

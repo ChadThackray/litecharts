@@ -75,6 +75,21 @@ chart = createChart({
 })
 ```
 
+### Fit Content
+
+Auto-fit the visible time range to show all data points:
+
+```python
+chart = createChart({"width": 800, "height": 400})
+candles = chart.addSeries(CandlestickSeries)
+candles.setData(data)
+
+chart.fitContent()
+chart.show()
+```
+
+This calls `timeScale().fitContent()` in the generated JS. Best for small/medium datasets — for large datasets the default behavior (anchored to the right edge) may be preferable.
+
 ## Price Scale
 
 ```python

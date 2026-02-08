@@ -25,6 +25,7 @@ const props = withDefaults(defineProps<Props>(), {
   margin: 1rem 0;
   border-radius: 8px;
   overflow: hidden;
+  background: var(--vp-c-bg-soft);
 }
 
 .chart-example iframe {

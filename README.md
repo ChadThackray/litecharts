@@ -41,6 +41,8 @@ chart.show()  # Auto-detects Jupyter or opens browser
 
 - Candlestick, Line, Area, Bar, Histogram, and Baseline series
 - Multi-pane layouts with synced time scales
+- Series markers for buy/sell signals and annotations
+- Customizable HTML output styling
 - Pandas DataFrame and NumPy array support
 - Jupyter notebook integration
 - Self-contained HTML output
@@ -81,6 +83,24 @@ candles.setData(ohlcData)
 volumePane = chart.addPane({"stretchFactor": 1})
 volume = volumePane.addSeries(HistogramSeries)
 volume.setData(volumeData)
+
+chart.show()
+```
+
+## Markers
+
+```python
+from litecharts import createChart, CandlestickSeries, createSeriesMarkers
+
+chart = createChart({"width": 800, "height": 400})
+candles = chart.addSeries(CandlestickSeries)
+candles.setData(ohlcData)
+
+# Add buy/sell markers
+createSeriesMarkers(candles, [
+    {"time": 1609459200, "position": "belowBar", "shape": "arrowUp", "color": "#26a69a", "text": "Buy"},
+    {"time": 1609718400, "position": "aboveBar", "shape": "arrowDown", "color": "#ef5350", "text": "Sell"},
+])
 
 chart.show()
 ```
